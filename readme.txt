@@ -11,7 +11,7 @@ Hide or change items in admin panel. Customize buttons from admin menu.
 == Description ==
 With this plugin You can hide or change unwanted items in admin and login pages. 
 For example, You can easily change header or footer text, remove unwanted options like Screen options, Help options or Favorites dropdown menu.
-You can also completely change or hide buttons from admin menu, or add new customized butons.
+You can also completely change or hide buttons from admin menu, or add new customized buttons.
 
 Here is the list of options:
 
@@ -34,7 +34,7 @@ Here is the list of options:
 	- Change/remove footer text
 	- Change/remove footer version text
 
-	Dasboard Page Options
+	Dashboard Page Options
 	- Hide Dashboard heading icon
 	- Change Dashboard heading text
 	- Add custom Dashboard content
@@ -64,7 +64,7 @@ For more information about the plugin please see: http://wordpress.argonius.com/
 == Frequently Asked Questions ==
 
 = My text is not in the right place. How to fix it? =
-It is possible that WordPress usualy wraps that text with some HTML tags. In that case use one of HTML tags to surround your text, e.g. &lt;h1&gt;My text&lt;/h1&gt;, or other (a, p, h2, h3..  etc.)
+It is possible that WordPress usually wraps that text with some HTML tags. In that case use one of HTML tags to surround your text, e.g. &lt;h1&gt;My text&lt;/h1&gt;, or other (a, p, h2, h3..  etc.)
 
 == Screenshots ==
 
@@ -77,19 +77,19 @@ It is possible that WordPress usualy wraps that text with some HTML tags. In tha
 = 1.2.1 =
 * Improved accessibility
 * Optimization for screen readers
-* Added subpage titles
+* Added sub-page titles
 * Updated styles in edit admin menu table
 
 = 1.2 =
 * All elements are grouped into small pages for better navigation.
-* Added color styles and improved user expirience.
+* Added color styles and improved user experience.
 * Added settings page for fully control of main admin menu.
-* Added support for hidding items from admin menu.
+* Added support for hiding items from admin menu.
 * Added support for changing items in admin menu.
 * Added support for adding new custom items in admin menu.
-* Added tooltips on option labels for better explanation of option.
+* Added tool tips on option labels for better explanation of option.
 * Deprecated 'Hide Dashboard button from main menu' in 'Dashboard settings'. This option can be used now in 'Admin menu settings'.
-* Added settings for hidding/showing Dasboard widgets:"Recent Comments", "Incoming Links", "Plugins", "Quick Press", "Right Now", "Recent Drafts", primary widget area, secondary widget area.
+* Added settings for hiding/showing Dashboard widgets:"Recent Comments", "Incoming Links", "Plugins", "Quick Press", "Right Now", "Recent Drafts", primary widget area, secondary widget area.
 * Added option "(but show 'Log Out' button)" for displaying 'Log Out' button if admin top bar is completely removed.
 * Added option "Hide footer text".
 * Added support for hidding new Wordpress release notification.
