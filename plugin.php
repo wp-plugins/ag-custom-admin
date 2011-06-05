@@ -23,8 +23,6 @@ Author URI: http://wordpress.argonius.com/ag-custom-admin
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 $agca = new AGCA();
 
 class AGCA{
