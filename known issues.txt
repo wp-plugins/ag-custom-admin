@@ -1,0 +1,46 @@
+ADmin menu - add new button
+- When editing new button, if edit is clicked, and then remove is clicked, it is not possible to press any other edit button.
+
+hide update notification not working for 3.0 (class="update-nag")
+v
+colorizer not updated colors in textbox colors if colorizer disabled
+
+add new custom button - clear textboxes after adding
+
+0 in admin menu, count of updates etc
+
+jQuery conflict add new name
+blank screen send error message
+multiple users support
+
+//posible solution for jQuery conflict, check if jquery object exists first
+<?php
+function my_init_method() {
+wp_deregister_script( 'jquery' );
+wp_register_script(   'jquery'
+    , 'http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js');
+}    
+ 
+add_action('init', 'my_init_method');
+?> 
+
+
+
+
+VESION 3.2
+------------
+admin bar on right howdy and logout rename not working
+solution: check if 3.2 version or higher and do something different
+
+login page-login top bar does not exist. if >3.2 change option text 'hide login top bar completely' to like 'remove go back to page'
+
+admin menu - does not work
+
+colorizer - widget background does not work
+
+
+
+version 1.2.5
+--------------
+fixed header load image in ie older versions
+added error messages in try catch block
