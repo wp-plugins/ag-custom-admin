@@ -28,7 +28,6 @@ $agca = new AGCA();
 class AGCA{
 	private $colorizer="";	
 	private $active_plugin;
-	private $agca_version = "1.2.5.1";
 	public function __construct()
 	{			
 		
@@ -303,7 +302,7 @@ class AGCA{
 <script type="text/javascript">
 document.write('<style type="text/css">html{visibility:hidden;}</style>');
 var wpversion = "<?php echo $wpversion; ?>";
-var agca_version = "<?php echo $this->agca_version; ?>";
+var agca_version = "1.2.5.1";
 var errors = false;
 
   /* <![CDATA[ */
@@ -391,6 +390,10 @@ try
 					<?php } ?>
 					<?php if(get_option('agca_custom_site_heading')!=""){ ?>	
 							jQuery("#wphead #site-heading").after('<h1><?php echo get_option('agca_custom_site_heading'); ?></h1>');
+							//3.3FIX
+							if(wpversion=="3.3"){
+								jQuery("#wp-admin-bar-site-name a:first").html('<?php echo get_option('agca_custom_site_heading'); ?>');
+							}
 					<?php } ?>	
 					<?php if(get_option('agca_update_bar')==true){ ?>
 							jQuery("#update-nag").css("display","none");
@@ -398,6 +401,9 @@ try
 					<?php } ?>
 					<?php if(get_option('agca_header')==true){ ?>
 							jQuery("#wphead").css("display","none");
+							
+							//3.3FIX
+							jQuery("#wpadminbar").css("display","none");							
 					<?php } ?>	
 					<?php if((get_option('agca_header')==true)&&(get_option('agca_header_show_logout')==true)){ ?>
 							var clon ="";
@@ -412,19 +418,33 @@ try
 							}													
 							jQuery("#wphead").after(clon);
 							
+							//3.3.FIX								
+							if(wpversion == "3.3"){	
+							jQuery("#wpbody-content").prepend('<a href="../wp-login.php?action=logout" tabindex="10" style="float:right;margin-right:20px" class="ab-item">Log Out</a>');
+								
+							}
+							
 					<?php } ?>	
 					<?php if(get_option('agca_footer')==true){ ?>
 							jQuery("#footer").css("display","none");
 					<?php } ?>											
 					<?php if(get_option('agca_howdy')!=""){ ?>					
 							<?php //code for wp version >= 3.2 ?>
-							<?php if($wpversion >= 3.2 ){ ?>
+							<?php if($wpversion >= 3.2 && $wpversion < 3.3){ ?>
 									var alltext="";								
 									alltext="";
 									alltext = jQuery('#user_info div.hide-if-no-js').html();
 									alltext = alltext.replace('Howdy',"<?php echo get_option('agca_howdy'); ?>");									
 									jQuery("#user_info div.hide-if-no-js").html(alltext);
 									
+							<?php }
+							//3.3FIX
+							else if($wpversion == 3.3){ ?>
+									var alltext="";								
+									alltext="";
+									alltext = jQuery('li#wp-admin-bar-my-account').html();
+									alltext = alltext.replace('Howdy',"<?php echo get_option('agca_howdy'); ?>");									
+									jQuery("li#wp-admin-bar-my-account").html(alltext);
 							<?php }else{ ?>
 							<?php //code for wp version < 3.2 ?>
 								var howdyText = jQuery("#user_info").html();
@@ -541,8 +561,10 @@ try
 							$this->remove_dashboard_widget('dashboard_secondary','side');
 						}else{
 							?>jQuery("#dashboard_secondary").css("display","block");<?php
-						}
-					?>				
+						}					
+						
+					?>	
+					
 			
 					
 					<?php /*ADMIN MENU*/ ?>							
@@ -645,7 +667,7 @@ try
 							jQuery("#adminmenu").removeClass("noclass");
 					<?php } ?>				
 					
-					reloadRemoveButtonEvents();				
+					reloadRemoveButtonEvents();					
 				
 					
 					<?php //COLORIZER ?>
@@ -666,7 +688,7 @@ try
 					<?php //COLORIZER END ?>				
 <?php } //end of apply for any user except admin ?>		
 /*Add user buttons*/	
-jQuery('#ag_add_adminmenu').append(buttonsJq); 
+jQuery('#ag_add_adminmenu').append(buttonsJq); 					
  }catch(err){	
 	errors = "AGCA - ADMIN ERROR: " + err.name + " / " + err.message;
 	alert(errors);		
@@ -687,6 +709,11 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 			.form-table th{
 				width:300px;
 			}
+			
+			/*3.3.FIX*/
+			#dashboard-widgets div.empty-container{				
+				display:none;
+			}
 		</style>
 	<?php 	
 	}
@@ -700,8 +727,8 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 		
 	     <script type="text/javascript">
 		 document.write('<style type="text/css">html{display:none;}</style>');
+		 var agca_version = "1.2.5.1";
 		 var wpversion = "<?php echo $wpversion; ?>";		
-		 var agca_version = "<?php echo $this->agca_version; ?>";		 
         /* <![CDATA[ */
             jQuery(document).ready(function() {			
 				try{ 
@@ -787,7 +814,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 			<script type="text/javascript" src="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ?>script/agca_farbtastic.js"></script>	
 		<?php //includes ?>		
 		<div class="wrap">
-			<h1 style="color:green">AG Custom Admin Settings <span style="font-size:15px;">(v<?php echo $this->agca_version; ?>)</span></h1>						
+			<h1 style="color:green">AG Custom Admin Settings <span style="font-size:15px;">(v1.2.5.1)</span></h1>						
 										<div id="agca_news">&nbsp;</div><br />								
 			<form method="post" id="agca_form" action="options.php">
 				<?php settings_fields( 'agca-options-group' ); ?>
@@ -840,6 +867,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 								</td>
 								<td></td>
 							</tr>
+							<?php if($wpversion<3.3){?>
 							<tr valign="center">
 								<th >
 									<label title="This is link next to heading in admin bar" for="agca_privacy_options">Hide Privacy link</label>
@@ -848,6 +876,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<input type="checkbox" title="This is link next to heading in admin bar" name="agca_privacy_options" value="true" <?php if (get_option('agca_privacy_options')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
+							<?php } ?>
 							<tr valign="center">
 								<th >
 									<label title="Change default WordPress logo with custom image." for="agca_header_logo_custom">Change WordPress logo</label>
