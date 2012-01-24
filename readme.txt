@@ -92,7 +92,9 @@ Please use 'Reset Settings' button on Admin Menu page to reset menu configuratio
 * Fixed issues related to WP 3.3.1 version
 * Fixed bug: Hidding/changing top admin bar WP icon
 * Advanced customization of admin top bar 
+* Added options for hiding admin top bar elements
 * Login page background same as admin background
+* Added target options for custom admin buttons
 
 = 1.2.5.2 =
 * Fixed several issues with WP 3.3
