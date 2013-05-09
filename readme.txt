@@ -3,9 +3,9 @@ Contributors: argonius
 Donate link: http://agca.argonius.com/ag-custom-admin/support-for-future-development
 Tags: admin, customize, hide, change admin
 Requires at least: 3.0
-Tested up to: 3.5
+Tested up to: 3.5.1
 Stable tag: 1.2.7
-
+ 
 Hide or change items in admin panel. Customize buttons from admin menu. Colorize admin and login page with custom colors.
 
 == Description ==
@@ -76,8 +76,9 @@ Here is the list of options:
 	- Add custom JavaScript
 	- Export/import customization settings
 
+**IMPORTANT**: AG Custom Admin should always be updated before updating WordPress. If you are unable to login or you have any other problems, please check our [FAQ](http://wordpress.org/extend/plugins/ag-custom-admin/faq/) and [SUPPORT](http://wordpress.org/support/plugin/ag-custom-admin) page.
 
-For more information about the plugin please see: http://agca.argonius.com/ag-custom-admin/
+For more information about the plugin please check [PLUGIN WEBSITE](http://agca.argonius.com/ag-custom-admin/)
 
 == Installation ==
 
@@ -101,7 +102,7 @@ Go to browser's console and see if there are any errors. Try to locate them. If 
 
 = Plugin does not work =
 Try clearing browser's cache. If that does not work, go to browser's console and see if there are any errors. Try to locate them. If you can't fix error by yourself, post it back to plugin's support page. When trying to locate the problem, the best way is to disable other plugins, because there could be a conflict with them. If there is a conflict with other plugin, it can be found by disabling one by one plugin, until the problem is solved.
-
+ 
 
 == Screenshots ==
 
@@ -111,6 +112,14 @@ Try clearing browser's cache. If that does not work, go to browser's console and
 4. Default WP grey colors can be refreshed with any colors that you like! There are a lot of Colorizer option which can be use to style text, background, login, widgets, admin menu, top bar, footer and many more!
 
 == Changelog ==
+
+= 1.2.7.1 =
+* Removed AGCA script on site pages automaticaly, if user is not logged in
+* Custom WordPress admin title. Using custom title templates
+* Added option for removing blog title from top bar
+* Fixed missaligned menu when using custom content types plugins
+* Fixed bug "Save button does not work" caused by unescaped characters in footer text and custom button names
+* Updated AGCA buttons styles
 
 = 1.2.7 =
 * WordPress 3.5 compatible
@@ -269,6 +278,9 @@ Try clearing browser's cache. If that does not work, go to browser's console and
 * Initial version
 
 == Upgrade Notice ==
+
+= 1.2.7.1 =
+Bug fixes. Removing admin bar site title. Custom page titles in WP admin.
 
 = 1.2.7 =
 Plugin prepared for WordPress 3.5. Few additional improvements.
