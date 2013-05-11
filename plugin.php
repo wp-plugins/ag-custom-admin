@@ -4,7 +4,7 @@ Plugin Name: AG Custom Admin
 Plugin URI: http://agca.argonius.com/ag-custom-admin/category/ag_custom_admin
 Description: Hide or change items in admin panel. Customize buttons from admin menu. Colorize admin and login page with custom colors.
 Author: Argonius
-Version: 1.2.7.1
+Version: 1.2.7.2
 Author URI: http://www.argonius.com/
 
 	Copyright 2011. Argonius (email : info@argonius.com)
@@ -22,9 +22,6 @@ Author URI: http://www.argonius.com/
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-//require_once('/../../../../../FirePHPCore/lib/FirePHPCore/fb.php'); 
-//fb($_POST);
 	
 $agca = new AGCA();
 
@@ -33,12 +30,15 @@ class AGCA{
 	private $active_plugin;
 	private $agca_version;    
 	private $admin_capabilities;    	
-        private $context = "";
-        private $saveAfterImport = false;
+    private $context = "";
+    private $saveAfterImport = false;
+	private $templates_ep = "https://gator1106.hostgator.com/~argonius/agca/templates/trunk/";
+	//private $templates_ep = "http://agca.argonius.com/templates/trunk/";
 	public function __construct()
-	{           
-            
-                $this->reloadScript();
+	{   	        			
+        $this->reloadScript();		
+		$this->checkPOST();
+		$this->checkGET();		
             
 		add_filter('admin_title', array(&$this,'change_title'), 10, 2); 		
 		add_filter('plugin_row_meta', array(&$this,'jk_filter_plugin_links'), 10, 2);
@@ -52,7 +52,22 @@ class AGCA{
 		/*Initialize properties*/		
 		$this->colorizer = $this->jsonMenuArray(get_option('ag_colorizer_json'),'colorizer');
                 //fb($this->colorizer);
-		$this->agca_version = "1.2.7.1";
+		$this->agca_version = "1.2.7.2";
+		
+		/*upload images programmaticaly*/
+		//TODO upload with AJAX one by one, use post data to send urls one by one
+		/*function my_sideload_image() {
+			$file = media_sideload_image( 'http://a2.twimg.com/a/1318451435/phoenix/img/twitter_logo_right.png', 0 );
+			$file1 = media_sideload_image( 'http://agca.argonius.com/templates/trunk/images/templates/monday/j1.jpg', 0 );
+			$file2 = media_sideload_image( 'http://agca.argonius.com/templates/trunk/images/templates/monday/2.jpg', 0 );
+			$url=explode("'",explode("src='",$file)[1])[0];			
+			$url.=explode("'",explode("src='",$file1)[1])[0];	
+			$url.=explode("'",explode("src='",$file2)[1])[0];	
+			echo $url;
+			
+		}
+		add_action( 'admin_init', 'my_sideload_image' );*/
+		/*upload images programmaticaly*/
 	}
 	// Add donate and support information
 	function jk_filter_plugin_links($links, $file)
@@ -65,6 +80,85 @@ class AGCA{
 		}
 		return $links;
 	}
+	
+	function checkGET(){
+		if(isset($_GET['agca_action'])){
+			if($_GET['agca_action'] =="remove_templates"){
+				update_option('agca_templates', "");
+				update_option('agca_selected_template', "");
+			}
+		}
+	}
+	
+	function checkPOST(){
+		if(isset($_POST['_agca_save_template'])){
+		  //print_r($_POST);					  
+		  $data = $_POST['templates_data'];
+		  $parts = explode("|||",$data);
+		  $common_data = $parts [0];
+		  $admin_data = $parts [1];
+		  $login_data = $parts [2];
+		  $images = $parts [3];
+		  $template_name = $_POST['templates_name'];	
+			
+			update_option('agca_selected_template', $template_name);
+			
+			$templates = array();
+			if(get_option( 'agca_templates' ) != ""){
+				$templates = get_option( 'agca_templates' );				
+			}
+			
+			$templates[$template_name] = array(
+				'common'=>$common_data,
+				'admin'=>$admin_data,
+				'login'=>$login_data,
+				'images'=>$images
+				);
+			update_option('agca_templates', $templates);
+			
+			$_POST = array();
+			
+		}else if(isset($_POST['_agca_get_templates'])){
+			$templates = get_option( 'agca_templates' );
+			$results = array();
+			foreach($templates as $key=>$val){
+				$results[]=$key;
+			}
+			echo json_encode($results);
+			exit;
+		}else if(isset($_POST['_agca_activate_template'])){
+			update_option('agca_selected_template', $_POST['_agca_activate_template']);
+			$_POST = array();
+			//unset($_POST);
+			exit;
+		}else if(isset($_POST['_agca_upload_image'])){
+			
+		function my_sideload_image() {
+			$remoteurl = $_POST['_agca_upload_image'];			
+			$file = media_sideload_image( $remoteurl, 0 );			
+			$url=explode("'",explode("src='",$file)[1])[0];						
+			echo $url;
+			exit;
+			
+		}
+		add_action( 'admin_init', 'my_sideload_image' );
+		
+		}else if(isset($_POST['_agca_remove_template_images'])){
+			exit; //TODO: implement removing stored images before new images are created
+			//echo "template:"; echo $_POST['_agca_remove_template_images'];
+			$templates = get_option('agca_templates');
+			if($templates != null && $templates != ""){
+				$template = $templates[$_POST['_agca_remove_template_images']];
+				if($template != null && $template['images'] != null && $template['images'] != ""){
+					$imgs = explode(',',$template['images']);
+					
+				}
+			}
+			//print_r($templates);
+			exit;
+		}
+	}
+	
 	function isGuest(){
 		global $user_login;
 		if($user_login) {
@@ -200,7 +294,9 @@ class AGCA{
 		register_setting( 'agca-options-group', 'agca_login_register_href' );
 		register_setting( 'agca-options-group', 'agca_login_lostpassword_remove' );
 		register_setting( 'agca-options-group', 'agca_admin_capability' );		
-		
+		register_setting( 'agca-template-group', 'agca_selected_template' );	
+		register_setting( 'agca-template-group', 'agca_templates' );				
+		//delete_option( 'agca_templates' );			
 
 
 		/*Admin menu*/
@@ -246,9 +342,7 @@ class AGCA{
                             }
                     }else if(isset($_POST['_agca_export_settings']) && $_POST['_agca_export_settings']=="true"){
                             $this->exportSettings();  
-                    }else{
-                       
-                    }    
+                    }					
                 }
 	}
 
@@ -972,6 +1066,30 @@ if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='t
     echo 'isSettingsImport = true;';
 }
 ?>    
+</script>
+<?php 
+ 
+	if(get_option( 'agca_templates' ) != ""){
+			//print_r(get_option( 'agca_templates' ));
+			$templates = get_option( 'agca_templates' );
+			foreach($templates as $templname=>$templdata){
+				if($templname == get_option('agca_selected_template')){
+					
+					echo ($templdata['common']);
+					echo "<!--AGCAIMAGES: ".$templdata['images']."-->";
+				 if(!((get_option('agca_role_allbutadmin')==true) and  (current_user_can($this->admin_capability())))){	
+					echo ($templdata['admin']);
+				 }				
+					break;
+				}
+			}
+	}
+  
+	
+  
+		
+?> 
+<script type="text/javascript">
   /* <![CDATA[ */
 jQuery(document).ready(function() {	
 
@@ -1094,7 +1212,7 @@ try
 
 					
 					<?php if(get_option('agca_footer_left')!=""){ ?>												
-								jQuery("#footer-left").html('<?php echo get_option('agca_footer_left'); ?>');
+								jQuery("#footer-left").html('<?php echo addslashes(get_option('agca_footer_left')); ?>');
 					<?php } ?>	
 					<?php if(get_option('agca_footer_left_hide')==true){ ?>											
 								jQuery("#footer-left").css("display","none");
@@ -1376,6 +1494,24 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 		 var wpversion = "<?php echo $wpversion; ?>";
                  var isSettingsImport = false;
                  var agca_context = "login";
+				 
+		</script>
+		<?php 
+		if(get_option( 'agca_templates' ) != ""){
+			//print_r(get_option( 'agca_templates' ));
+			$templates = get_option( 'agca_templates' );
+			foreach($templates as $templname=>$templdata){
+				if($templname == get_option('agca_selected_template')){
+					echo ($templdata['common']);
+					echo($templdata['login']);
+					break;
+				}
+			}
+		}
+		?> 	
+		<script type="text/javascript">
+				 
+				 
         /* <![CDATA[ */
             jQuery(document).ready(function() {			
 				try{ 
@@ -1512,9 +1648,222 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 			
 			<link rel="stylesheet" type="text/css" href="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ?>style/agca_farbtastic.css" />
 			<script type="text/javascript" src="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ?>script/agca_farbtastic.js"></script>
+			<script type="text/javascript" src="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ?>script/xd.js"></script>
                         <script type="text/javascript">
                             var isAGCAPage = true;
-                        </script>
+							var templates_ep = "<?php echo $this->templates_ep; ?>";
+							var template_name = "";						
+							var templates_installed = [];
+							var template_selected = '<?php echo get_option('agca_selected_template'); ?>';
+							var xhr =null;
+							
+									function agca_getTemplateCallback(data){										
+										if(data.success == 0){
+											alert(data.data);
+											jQuery('#agca_template_popup').hide();
+										}else{
+											jQuery("#templates_name").val(template_name);
+											var parts = data.data.split("||||");
+											jQuery("#templates_data").val(parts[1]);	
+											//console.log(jQuery("#templates_data").val());
+											jQuery("body").append(parts[0]);
+											
+											//remove old images of this template
+											agca_removePreviousTemplateImages();																					
+											
+										}																			
+									}		
+
+									function agca_getTemplatesCallback(data){										
+										jQuery('#agca_templates').html(data.data);	
+										jQuery('#advanced_template_options').show();										
+									}				
+
+									function agca_getConfigurationCallback(data){
+										var parsed = JSON.parse(data.data);
+										templates_ep = parsed.ep;
+										agca_getTemplates();
+									}
+									
+									function agca_setupXHR(){
+										if(xhr != null) return false;
+										jQuery('#agca_templates').html('<p style="font-size:18px;color:gray;font-style:italic">Loading templates...</p>');
+										agca_getLocalTemplates();
+										xhr = new easyXDM.Rpc({
+										remote:templates_ep
+										}, {
+											remote: {
+												request: {												
+												}
+											},
+											handle: function(data, send){								
+												if(data.success){													
+													var callbackFname = data.url.split('callback=')[1];
+													var fn = window[callbackFname];
+													if(fn != undefined){
+														fn(data);
+													}												
+												}else{
+													console.log(data);													
+													var url = data.url;													
+													if(url !== undefined && url != ""){
+														var cb = url.split('callback=')[1];
+														if(cb != ""){
+															var fn = window[cb];
+															if(fn != undefined){
+																fn(data);
+															}	
+														}
+													}
+												}					
+											}	
+										});
+									}
+									
+									function agca_getTemplates(){
+									
+									//agca_uploadRemoteImage('http://www.neowing.co.jp/idol_site2/image/FDGD-21/fdgd-21-top.jpg');									
+										xhr.request({
+												url: templates_ep + "service/client" + "?callback=agca_getTemplatesCallback",
+												method: "POST",														
+												callBack: agca_getTemplatesCallback,
+												data: {isPost:true}
+											});	
+											
+												
+									}
+									
+									function agca_getConfiguration(){
+										xhr.request({
+												url: templates_ep + "/configuration" + "?callback=agca_getConfigurationCallback",
+												method: "POST",														
+												callBack: agca_getConfigurationCallback,
+												data: {isPost:true}
+											});
+									}
+									
+									function agca_getTemplate(template, key){
+										template_name = template;
+										xhr.request({
+												url: templates_ep + "service/gettemplate"+"?tmpl="+template+"&key="+key+"&callback=agca_getTemplateCallback",
+												method: "POST",														
+												callBack: agca_getTemplateCallback,
+												data:  {isPost:true}
+											});	
+									}
+									
+									function agca_activateTemplate(template){
+										var url = window.location;								
+										jQuery.post(url,{"_agca_activate_template":template},
+										function(data){																				
+											window.location = 'tools.php?page=ag-custom-admin/plugin.php';
+										})
+										.fail(
+										function(){
+											console.log('AGCA Error: agca_activateTemplate()');
+										});
+									}							
+									
+									function agca_removeAllTemplates(){
+										yesnoPopup("Are you sure? All installed templates will be removed?",agca_removeAllTemplatesConfirmed);										
+									}
+									
+									function agca_removeAllTemplatesConfirmed(){
+										window.location = 'tools.php?page=ag-custom-admin/plugin.php&agca_action=remove_templates';										
+									}
+									
+									function handleLocalyStoredImages(){
+									console.log(jQuery("#templates_data").val());
+										var originalText = jQuery("#templates_data").val();
+										var serializedImages = "";
+										for(var tag in agca_local_images){												
+											if(tag != ""){
+												if(serializedImages !=""){
+													serializedImages+=",";
+												}
+												serializedImages+=agca_local_images[tag];
+												originalText = originalText.replace(new RegExp(tag, 'g'), agca_local_images[tag]);										
+											}											
+										}										
+										jQuery("#templates_data").val(originalText+"|||"+serializedImages);
+										//console.log(jQuery("#templates_data").val());
+										
+										//save finally
+									    jQuery("#agca_templates_form").submit();	
+									}
+									
+									function agca_updateInstallProgress(){
+										agca_local_images_count++;
+										var current = agca_remote_images_count - agca_local_images_count;
+										var text = agca_local_images_count +"/" + (parseInt(agca_remote_images_count)-1);
+										
+										jQuery('.agca_content #activating').text('Installing ('+text+') ...');
+									}
+									
+									function agca_removePreviousTemplateImages(){								    
+										/*var url = window.location;								
+										jQuery.post(url,{"_agca_remove_template_images":template_name},
+											function(data){																				
+											  console.log(data);									
+										})
+										.fail(
+											function(e){
+											console.log('AGCA Error: agca_removePreviousTemplateImages()');
+											console.log(e);
+										});*/
+										
+										//upload remote images on callback
+										agca_uploadRemoteImages();
+									}
+									
+									function agca_uploadRemoteImages(){									
+
+										var found = false;
+										for(var tag in agca_remote_images){
+											found = true;
+											agca_updateInstallProgress();
+											agca_uploadRemoteImage(agca_remote_images[tag], tag);											
+											break;
+										}										
+										if(!found){
+											jQuery('.agca_content #activating').text('Installation successful. Reloading...');
+											window.setTimeout(handleLocalyStoredImages,2000);
+										}
+									}
+									
+									function agca_uploadRemoteImage(remoteUrl, tag){
+										var url = window.location;								
+										jQuery.post(url,{"_agca_upload_image":remoteUrl},
+										function(data){																				
+										console.log(data);										
+										agca_local_images[tag] = data;
+										delete agca_remote_images[tag];
+										agca_uploadRemoteImages();
+											//window.location = 'tools.php?page=ag-custom-admin/plugin.php';
+										})
+										.fail(
+										function(){
+											console.log('AGCA Error: agca_activateTemplate()');
+										});
+									}
+									
+									function agca_getLocalTemplates(){
+										var url = window.location;
+										jQuery.post(url,{"_agca_get_templates":true},
+										function(data){										
+											//console.log(data);
+											templates_installed = JSON.parse(data);
+											//agca_getTemplates();
+											agca_getConfiguration();
+											
+										})
+										.fail(
+										function(){
+											console.log('AGCA Error: agca_getLocalTemplates()');
+										});
+									}														
+							
+                        </script>						
 		<?php //includes ?>		
 		<div class="wrap">
 			<h1 style="color:green">AG Custom Admin Settings <span style="font-size:15px;">(v<?php echo $this->agca_version; ?>)</span></h1>						
@@ -1540,7 +1889,9 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 				<li class="normal"><a href="#login-page-settings" title="Settings for Login page">Login Page</a></li>
 				<li class="normal" ><a href="#admin-menu-settings" title="Settings for main admin menu">Admin Menu</a></li>
 				<li class="normal"><a href="#ag-colorizer-setttings" title="AG colorizer settings">Colorizer</a></li>
-                                <li class="normal"><a href="#ag-advanced" title="My custom scripts">Advanced</a></li>
+				<li class="normal"><a href="#ag-templates" title="Predefined Templates">Templates</a></li>
+                <li class="normal"><a href="#ag-advanced" title="My custom scripts">Advanced</a></li>
+								
 				<li style="background:none;border:none;padding:0;"><a id="agca_donate_button" target="_blank" style="margin-left:8px" title="Like this plugin? You can support its future development by giving a donation by your wish " href="http://agca.argonius.com/ag-custom-admin/support-for-future-development"><img alt="Donate" src="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ?>images/btn_donate_LG.gif" /></a>
 				</li>                                
 				<li style="background:none;border:none;padding:0;padding-left:10px;margin-top:-7px"></li>		
@@ -1865,10 +2216,10 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 							</tr> 
 							<tr valign="center">
 								<th scope="row">
-									<label title="Replaces text 'Thank you for creating with WordPress. | Documentation | Feedback' with custom text" for="agca_footer_left">Change footer text</label>
+									<label title="Replaces text 'Thank you for creating with WordPress' with custom text" for="agca_footer_left">Change footer text</label>
 								</th>
 								<td>
-									<textarea title="Replaces text 'Thank you for creating with WordPress. | Documentation | Feedback' with custom text" rows="5" name="agca_footer_left" cols="40"><?php echo htmlspecialchars(get_option('agca_footer_left')); ?></textarea>
+									<textarea title="Replaces text 'Thank you for creating with WordPress' with custom text" rows="5" name="agca_footer_left" cols="40"><?php echo htmlspecialchars(get_option('agca_footer_left')); ?></textarea>
 								</td>						
 							</tr> 
 							<tr valign="center">
@@ -2446,6 +2797,29 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 							<input type="hidden" size="47" id="ag_colorizer_json" name="ag_colorizer_json" value="<?php echo htmlspecialchars(get_option('ag_colorizer_json')); ?>" />	
 							 <div id="picker"></div>			
 						</div>
+						<div id="section_templates" style="display:none" class="ag_section">	
+							<h2 class="section_title" tabindex="-1"><span style="float:left">Templates</span><span style="width:100px;color:red;font-size:15px;float:left;margin-top:-8px;margin-left:6px;display:block">(beta)</span></h2>											
+							<br /><br />						
+							<table class="form-table" width="500px">					
+							<tr valign="center">								
+								<td>	
+									<div id="agca_templates">									
+										
+									</div>									
+								</td>								
+							</tr>	
+							<tr>							
+								<td>
+									<div id="advanced_template_options">
+										<h4>Advanced Template Actions</h4>
+										<p style="color:red;"><strong>WARNING:</strong> Use these template actions only if you are experiencing some problems with AGCA templates. With these options you can deactivate or remove all installed templates.</p>
+										<p><a href="javascript:agca_activateTemplate('');">DEACTIVATE ALL TEMPLATES</a> - templates will be deactivated, but still installed.</p>
+										<p><a href="javascript:agca_removeAllTemplates();">REMOVE ALL TEMPLATES</a> - installed templates will be removed.</p>										
+									</div>
+								</td>
+							</tr>
+							</table>
+						</div>
                                                 <div id="section_advanced" style="display:none" class="ag_section">
                                                                         <h2 class="section_title" tabindex="-1">Advanced</h2>
                                                                         
@@ -2505,11 +2879,17 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
                                                                                 </table>
                                                 </div>
 				<br /><br /><br />
-				<p class="submit">				
+				<p class="submit">
 				<input type="button" id="save_plugin_settings" style="padding:0px" title="Save AG Custom Admin configuration" class="button-primary" value="<?php _e('Save Changes') ?>" onClick="savePluginSettings()" />
 				</p>        
                                 
 			</form>
+			<form id="agca_templates_form" name="agca_templates_form" action="<?php echo $_SERVER['PHP_SELF'];?>?page=ag-custom-admin/plugin.php" method="post">
+					<input type="hidden" name="_agca_save_template" value="true" />
+					<input type="hidden" id="templates_data" name="templates_data" value="" />								
+					<input type="hidden" id="templates_name" name="templates_name" value="" />			
+			</form>
+			
 			</div>
 							
 										<br />
@@ -2517,4 +2897,6 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 		<?php
 	}
 }
+//<link rel="stylesheet" type="text/css" href="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ? >style/agca.css" /> 
+//<link rel="stylesheet" type="text/css" href="http://localhost/wp/351/wp-content/plugins/ag-custom-admin/style/agca.css" />   
 ?>

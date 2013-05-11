@@ -287,6 +287,11 @@ function showHideSection(text) {
             jQuery('#section_ag_colorizer_settings').show();
             jQuery('#section_ag_colorizer_settings .section_title').trigger('focus');
             break;
+		case 'Templates':
+            jQuery('#section_templates').show();
+            jQuery('#section_templates .section_title').trigger('focus');
+			agca_setupXHR();
+            break;
         case 'Advanced':
             jQuery('#section_advanced').show();
             jQuery('#section_advanced .section_title').trigger('focus');
