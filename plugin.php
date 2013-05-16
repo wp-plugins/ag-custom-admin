@@ -31,9 +31,8 @@ class AGCA{
 	private $agca_version;    
 	private $admin_capabilities;    	
     private $context = "";
-    private $saveAfterImport = false;
-	private $templates_ep = "https://gator1106.hostgator.com/~argonius/agca/templates/trunk/";
-	//private $templates_ep = "http://agca.argonius.com/templates/trunk/";
+    private $saveAfterImport = false;	
+	private $templates_ep = "http://agca.argonius.com/templates/configuration.php";
 	public function __construct()
 	{   	        			
         $this->reloadScript();		
@@ -1656,6 +1655,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 							var templates_installed = [];
 							var template_selected = '<?php echo get_option('agca_selected_template'); ?>';
 							var xhr =null;
+							var agcaLoadingTimeOut = null;
 							
 									function agca_getTemplateCallback(data){										
 										if(data.success == 0){
@@ -1677,18 +1677,15 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									function agca_getTemplatesCallback(data){										
 										jQuery('#agca_templates').html(data.data);	
 										jQuery('#advanced_template_options').show();										
-									}				
-
-									function agca_getConfigurationCallback(data){
-										var parsed = JSON.parse(data.data);
-										templates_ep = parsed.ep;
-										agca_getTemplates();
+									}			
+									function agca_client_init(){
+										agca_getLocalTemplates();
+										checkIfTemplatesAreLoaded(1);
+										jQuery('#agca_templates').html('<p class="initialLoader" style="font-size:18px;color:gray;font-style:italic">Loading templates...</p>');										
 									}
 									
-									function agca_setupXHR(){
-										if(xhr != null) return false;
-										jQuery('#agca_templates').html('<p style="font-size:18px;color:gray;font-style:italic">Loading templates...</p>');
-										agca_getLocalTemplates();
+									function agca_setupXHR(){									
+										if(xhr != null) return false;																				
 										xhr = new easyXDM.Rpc({
 										remote:templates_ep
 										}, {
@@ -1722,7 +1719,8 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									
 									function agca_getTemplates(){
 									
-									//agca_uploadRemoteImage('http://www.neowing.co.jp/idol_site2/image/FDGD-21/fdgd-21-top.jpg');									
+									//agca_uploadRemoteImage('http://www.neowing.co.jp/idol_site2/image/FDGD-21/fdgd-21-top.jpg');	
+										agca_setupXHR();									
 										xhr.request({
 												url: templates_ep + "service/client" + "?callback=agca_getTemplatesCallback",
 												method: "POST",														
@@ -1734,11 +1732,22 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									}
 									
 									function agca_getConfiguration(){
-										xhr.request({
+										/*xhr.request({
 												url: templates_ep + "/configuration" + "?callback=agca_getConfigurationCallback",
 												method: "POST",														
 												callBack: agca_getConfigurationCallback,
 												data: {isPost:true}
+											});*/
+											jQuery.getJSON(templates_ep + "?callback=?",
+												function(data){ 
+													console.log("EP:"+data.ep);
+													templates_ep = data.ep;
+													agca_getTemplates();
+												}
+											).error(function(jqXHR, textStatus, errorThrown) {
+												agca_error({url:templates_ep,data:textStatus + " " + jqXHR.responseText});
+												/*console.log("error " + textStatus);
+												console.log("incoming Text " + jqXHR.responseText);*/
 											});
 									}
 									
@@ -1861,7 +1870,50 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 										function(){
 											console.log('AGCA Error: agca_getLocalTemplates()');
 										});
-									}														
+									}		
+									function agca_error(data){										
+										clearTimeout(agcaLoadingTimeOut);
+										if(jQuery('#agca_templates p:first').hasClass('initialLoader')){
+												jQuery('#agca_templates p:first').text('Unable to load templates. Please submit this error to AGCA support. Thank you!');										
+										}
+										alert('AG CUSTOM ADMIN TEMPLATE - ERROR\n\nError occured while loading configuration:\n'+data.url+'\n\n'+data.data);
+									}
+									
+									//check if templates loaded
+									function checkIfTemplatesAreLoaded(pass){
+										if(pass == 1){
+											agcaLoadingTimeOut = window.setTimeout(function(){
+											if(jQuery('#agca_templates p:first').hasClass('initialLoader')){
+												jQuery('#agca_templates p:first').text('Loading, please wait...');
+												checkIfTemplatesAreLoaded(2);
+											}
+											},6000);
+											
+										}else if(pass == 2){
+											agcaLoadingTimeOut = window.setTimeout(function(){
+											if(jQuery('#agca_templates p:first').hasClass('initialLoader')){
+												jQuery('#agca_templates p:first').text('Ready in a few moments...');
+												checkIfTemplatesAreLoaded(3);
+											}
+											},6000);
+											
+										}
+										else if(pass == 3){
+											agcaLoadingTimeOut = window.setTimeout(function(){
+											if(jQuery('#agca_templates p:first').hasClass('initialLoader')){
+												jQuery('#agca_templates p:first').text('This takes a bit longer than usual, please wait...');
+												checkIfTemplatesAreLoaded(4);
+											}
+											},7000);
+										}	
+										else if(pass == 4){
+											agcaLoadingTimeOut = window.setTimeout(function(){
+											if(jQuery('#agca_templates p:first').hasClass('initialLoader')){
+												jQuery('#agca_templates p:first').text('Sorry, unable to load templates right now. Please try again later.');
+											}
+											},10000);
+										}										
+									}
 							
                         </script>						
 		<?php //includes ?>		

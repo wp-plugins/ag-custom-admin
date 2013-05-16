@@ -288,9 +288,10 @@ function showHideSection(text) {
             jQuery('#section_ag_colorizer_settings .section_title').trigger('focus');
             break;
 		case 'Templates':
+			if(!jQuery('#section_templates').is(":visible"))
+				agca_client_init();
             jQuery('#section_templates').show();
-            jQuery('#section_templates .section_title').trigger('focus');
-			agca_setupXHR();
+            jQuery('#section_templates .section_title').trigger('focus');			
             break;
         case 'Advanced':
             jQuery('#section_advanced').show();
