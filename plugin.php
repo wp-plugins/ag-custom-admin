@@ -32,7 +32,8 @@ class AGCA{
 	private $admin_capabilities;    	
     private $context = "";
     private $saveAfterImport = false;	
-	private $templates_ep = "http://agca.argonius.com/templates/configuration.php";
+	//private $templates_ep = "http://agca.argonius.com/configuration.php";
+	private $templates_ep = "http://agca.argonius.com/debug.php";
 	public function __construct()
 	{   	        			
         $this->reloadScript();		
@@ -102,16 +103,17 @@ class AGCA{
 			
 			update_option('agca_selected_template', $template_name);
 			
-			$templates = array();
-			if(get_option( 'agca_templates' ) != ""){
-				$templates = get_option( 'agca_templates' );				
+			$templates = get_option( 'agca_templates' );			
+			if($templates == ""){
+				$templates = array();			
 			}
 			
 			$templates[$template_name] = array(
 				'common'=>$common_data,
 				'admin'=>$admin_data,
 				'login'=>$login_data,
-				'images'=>$images
+				'images'=>$images,
+				'settings'=>""
 				);
 			update_option('agca_templates', $templates);
 			
@@ -129,6 +131,21 @@ class AGCA{
 			update_option('agca_selected_template', $_POST['_agca_activate_template']);
 			$_POST = array();
 			//unset($_POST);
+			exit;
+		}else if(isset($_POST['_agca_template_settings'])){
+			$settings = $_POST['_agca_template_settings'];
+			
+			$templates = get_option( 'agca_templates' );			
+			if($templates == ""){
+				$templates = array();			
+			}
+			$template_name = get_option('agca_selected_template');
+			
+			$templates[$template_name]["settings"] = json_encode($settings);
+			update_option('agca_templates', $templates);
+			
+			$_POST = array();			
+			//print_r($templates);
 			exit;
 		}else if(isset($_POST['_agca_upload_image'])){
 			
@@ -1077,6 +1094,10 @@ if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='t
 					echo ($templdata['common']);
 					echo "<!--AGCAIMAGES: ".$templdata['images']."-->";
 				 if(!((get_option('agca_role_allbutadmin')==true) and  (current_user_can($this->admin_capability())))){	
+					if($templdata['settings'] == "") $templdata['settings'] = "{}";
+					echo "\n<script type=\"text/javascript\">";
+					echo "var agca_template_settings = ".$templdata['settings'].";\n";
+					echo "</script>";
 					echo ($templdata['admin']);
 				 }				
 					break;
@@ -1742,7 +1763,13 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 												function(data){ 
 													console.log("EP:"+data.ep);
 													templates_ep = data.ep;
-													agca_getTemplates();
+													if(data.error !=""){
+														jQuery('#agca_templates p.initialLoader').html(data.error);
+														jQuery('#agca_templates p').removeClass('initialLoader');
+														clearTimeout(agcaLoadingTimeOut);
+													}else{
+														agca_getTemplates();
+													}													
 												}
 											).error(function(jqXHR, textStatus, errorThrown) {
 												agca_error({url:templates_ep,data:textStatus + " " + jqXHR.responseText});
@@ -1759,6 +1786,79 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 												callBack: agca_getTemplateCallback,
 												data:  {isPost:true}
 											});	
+									}
+									
+									function agca_loadTemplateSettings(template){
+										template_name = template;
+										xhr.request({
+												url: templates_ep + "service/gettemplatesettings"+"?tmpl="+template+"&key=&callback=agca_getTemplateSettingsCallback",
+												method: "POST",														
+												callBack: agca_getTemplateSettingsCallback,
+												data:  {isPost:true}
+											});
+											//alert('saving template settings for template:' + template_name);
+									}
+									
+									function agca_getTemplateSettingsCallback(data){
+										if(data.success == 0){
+											//alert(data.data);
+											jQuery('#agca_template_settings .agca_loader').html(data.data);
+										}else{
+											var settings = "";
+											try{
+												settings = JSON.parse(data.data);
+												if(settings.length == 0){
+													jQuery('#agca_template_settings .agca_loader').html("Additional settings are not available for this template");
+												}else{
+													jQuery('#agca_template_settings .agca_loader').hide();
+													jQuery('#agca_save_template_settings').show();
+													for(var ind in settings){
+														var type = settings[ind].type;														
+														var text = "";
+														
+														var defaultValue = "";
+														if(agca_template_settings[settings[ind].name] != "undefined"){
+															defaultValue = agca_template_settings[settings[ind].name].value;
+														}
+														
+														if(type==1){
+															text = "<p>"+settings[ind].title+"</p><input type=\"text\" code=\""+settings[ind].name+"\" name=\"agcats_"+settings[ind].name+"\" value=\""+defaultValue+"\" code=\""+settings[ind].name+"\" class=\"setting\" stype=\"1\" /></br>";															
+														}else if(type==2){
+															text = "<p>"+settings[ind].title+"</p><textarea code=\""+settings[ind].name+"\" name=\"agcats_"+settings[ind].name+"\" class=\"setting\"  code=\""+settings[ind].name+"\" stype=\"2\" >"+defaultValue+"</textarea></br>";															
+														}
+														jQuery('#agca_template_settings').prepend(text);
+													}
+													jQuery('#agca_template_settings').prepend("<h3>Additional template options:</h3>");
+												}
+											}catch(e){
+												console.log(e);
+											}											
+										}
+										//alert('callb');
+									}
+									
+									function agca_saveTemplateSettings(template){
+										template_name = template;
+										var settings = {};
+										//get settings from the form
+										jQuery('#agca_template_settings .setting').each(function(){
+											settings[jQuery(this).attr('code')] ={
+												type: jQuery(this).attr('stype'),
+												value: jQuery(this).val()												
+											};
+										});
+										
+										jQuery('#agca_template_settings').html("<h3>Applying template settings...</h3>");
+										var url = window.location;																				
+										jQuery.post(url,{"_agca_template_settings":settings},
+										function(data){																				
+											window.location = 'tools.php?page=ag-custom-admin/plugin.php';
+											//console.log('reload');
+										})
+										.fail(
+										function(){
+											console.log('AGCA Error: agca_activateTemplate()');
+										});
 									}
 									
 									function agca_activateTemplate(template){
