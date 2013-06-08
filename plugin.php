@@ -7,7 +7,7 @@ Author: Argonius
 Version: 1.2.8
 Author URI: http://www.argonius.com/
 
-	Copyright 2011. Argonius (email : info@argonius.com)
+	Copyright 2013. Argonius (email : info@argonius.com)
  
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -238,9 +238,13 @@ class AGCA{
 		<?php
 	}
 	
+	function agca_enqueue_scripts() {			
+		wp_enqueue_script('jquery'); 
+	}
+	
 	function reloadScript(){
-            if(in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) || WP_ADMIN == 1){              
-                wp_enqueue_script('jquery');              
+            if(in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) || WP_ADMIN == 1){              			
+				add_action('init', array(&$this,'agca_enqueue_scripts'));				
             }             
 	}
 	
@@ -644,21 +648,22 @@ class AGCA{
 	}
 	
 	function finalErrorCheck(){
-		?>
+		?>		
 		function AGCAErrorPage(){
 			if(document.getElementsByTagName('html')[0].style.visibility == ""){
-			var txt = "";
-				txt += 'AG Custom Admin Error\n\n\n';
-				txt += 'AG Custom Admin is unable to correctly process this page. Probably there are some errors thrown from some of the installed plugins or templates.\n\n\n';
-				txt += 'To resolve this issue please:\n\n';
-				txt += '* Check browser\'s console for errors. Analyse .js script location which throws the error. Location of the script can give you more information about where is the source of the problem. Usualy it is a location of a plugin or a template. If there are more than one error, usualy the first one is the one which caused this problem.\n\n';
-				txt += '* If you can\'t access your login page, please disable JavaScript in your browser. After you log in, you can remove or fix problematic plugin, and re-enable JavaScript again.\n\n';
-				txt += '* If you can\'t find the source of the problem by yourself, please post this error to AGCA WordPress.org support page(http://wordpress.org/extend/plugins/ag-custom-admin/) or to AGCA support page(http://agca.argonius.com/ag-custom-admin/)';
-				txt += '\n\nThank you.';
-				alert(txt);
+			var txt = "";				
+				txt += '</br></br>AG Custom Admin is unable to correctly process this page. Probably there are some errors thrown from some of the installed plugins or templates.</br></br>';
+				txt += 'To resolve this issue please:</br><ul style="list-style-type:disc;list-style-position: inside;">';
+				txt += '<li><strong>Check browser\'s console for errors</strong>: Please analyse .js script location which throws the error. Location of the script can give you more information about where is the source of the problem. Usualy it is a location of a plugin or a template. If there are several errors, usualy the first one is the one which caused this problem, and you should try to resolve that one first.</li>';
+				txt += '<li><strong>Find the source of the problem</strong>: Please try disabling plugins/themes one by one, until the problem is solved. If you disable some plugin and the problem is solved after that, most likely is that plugin does not work well.</li>';
+				txt += '<li><strong>Can\'t access your login page?</strong> Please disable JavaScript in your browser. After you log in, you can remove or fix problematic plugin, and re-enable JavaScript again.</li>';
+				txt += '<li><strong>Still no progress?</strong> If you can\'t find the source of the problem by yourself, please check our <a target="_blank" href="http://agca.argonius.com/ag-custom-admin/ag_custom_admin/ag-custom-admin-js-error">support page for this error</a>. You can check also our <a target="_blank" href="http://wordpress.org/extend/plugins/ag-custom-admin/">AGCA WordPress.org support page</a></li>';
+				txt += '</ul></br>Thank you';				
+				document.body.innerHTML = '<div style="border: 1px solid gray;width:500px;height:auto;color:gray;background:white;margin:10px;margin-left:auto;margin-right:auto;padding: 20px;"><strong>AG Custom Admin JS Error</strong></br></br>Please try again after clearing browser\'s cache and reloading the page. If problem persists, please contact your administrator.</br></br><a href="#" onclick="document.getElementById(\'agca_more_info_for_admin\').style.display = \'block\'">Debug Info (for site administrator)</a><span style="display:none" id="agca_more_info_for_admin">'+txt+'</span></div>';				
 			}
-		}
-		window.setTimeout(AGCAErrorPage,4000);
+		}		
+		window.setTimeout(AGCAErrorPage, 15000);	
+		
 		<?php
 	}
 	
@@ -1095,10 +1100,33 @@ if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='t
 					echo "<!--AGCAIMAGES: ".$templdata['images']."-->";
 				 if(!((get_option('agca_role_allbutadmin')==true) and  (current_user_can($this->admin_capability())))){	
 					if($templdata['settings'] == "") $templdata['settings'] = "{}";
-					echo "\n<script type=\"text/javascript\">";
-					echo "var agca_template_settings = ".$templdata['settings'].";\n";
-					echo "</script>";
-					echo ($templdata['admin']);
+					//echo "\n<script type=\"text/javascript\">";
+					//echo "var agca_template_settings = ".$templdata['settings'].";\n";//TODO:  think about to remove
+					//print_r(json_decode($templdata['settings']));
+					//echo "</script>";
+					
+					//REPLACE TAGS WITH CUSTOM TEMPLATE SETTINGS
+					$template_settings = json_decode($templdata['settings']);
+					$admindata = $templdata['admin'];
+					
+					//TODO
+					//use array instead object
+					$template_settings = get_object_vars($template_settings); print_r($template_settings);
+					foreach($template_settings as $key=>$sett){
+					$value = $sett->value;
+						if($sett->type == 6){
+							if($value == "on"){
+								$value = true;
+							}else{
+								$value = false;
+							}
+						}
+						$admindata = str_replace("%".$key."%",$value, $admindata);						
+					}
+					echo $admindata;
+					//REPLACE TAGS WITH CUSTOM TEMPLATE SETTINGS
+					
+					//echo ($templdata['admin']);
 				 }				
 					break;
 				}
@@ -1609,7 +1637,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 						jQuery('label,h1,h2,h3,h4,h5,h6,a,p,.form-table th,.form-wrap label').css('text-shadow','none');
 						
 						if(isWPHigherOrEqualThan("3.3")){
-							jQuery("body.login").css("background","<?php echo $this->colorizer['login_color_background'];?>");
+							jQuery("body.login, html").css("background","<?php echo $this->colorizer['login_color_background'];?>");
 						}else{
 						
 							<?php
@@ -1695,7 +1723,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 										}																			
 									}		
 
-									function agca_getTemplatesCallback(data){										
+									function agca_getTemplatesCallback(data){									
 										jQuery('#agca_templates').html(data.data);	
 										jQuery('#advanced_template_options').show();										
 									}			
@@ -1709,12 +1737,13 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 										if(xhr != null) return false;																				
 										xhr = new easyXDM.Rpc({
 										remote:templates_ep
+										//onReady: function () { alert('ready'); }
 										}, {
 											remote: {
 												request: {												
 												}
 											},
-											handle: function(data, send){								
+											handle: function(data, send){
 												if(data.success){													
 													var callbackFname = data.url.split('callback=')[1];
 													var fn = window[callbackFname];
@@ -1761,7 +1790,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 											});*/
 											jQuery.getJSON(templates_ep + "?callback=?",
 												function(data){ 
-													console.log("EP:"+data.ep);
+													console.log("EP:"+data.ep);													
 													templates_ep = data.ep;
 													if(data.error !=""){
 														jQuery('#agca_templates p.initialLoader').html(data.error);
@@ -1815,16 +1844,23 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 													for(var ind in settings){
 														var type = settings[ind].type;														
 														var text = "";
-														
+														//console.log(settings[ind]);
 														var defaultValue = "";
-														if(agca_template_settings[settings[ind].name] != "undefined"){
+														if(agca_template_settings[settings[ind].name] != undefined){
 															defaultValue = agca_template_settings[settings[ind].name].value;
 														}
 														
 														if(type==1){
-															text = "<p>"+settings[ind].title+"</p><input type=\"text\" code=\""+settings[ind].name+"\" name=\"agcats_"+settings[ind].name+"\" value=\""+defaultValue+"\" code=\""+settings[ind].name+"\" class=\"setting\" stype=\"1\" /></br>";															
+															text = "<p>"+settings[ind].title+"</p><input type=\"text\" name=\"agcats_"+settings[ind].name+"\" value=\""+defaultValue+"\" code=\""+settings[ind].name+"\" class=\"setting\" stype=\"1\" /></br>";															
 														}else if(type==2){
-															text = "<p>"+settings[ind].title+"</p><textarea code=\""+settings[ind].name+"\" name=\"agcats_"+settings[ind].name+"\" class=\"setting\"  code=\""+settings[ind].name+"\" stype=\"2\" >"+defaultValue+"</textarea></br>";															
+															text = "<p>"+settings[ind].title+"</p><textarea name=\"agcats_"+settings[ind].name+"\" class=\"setting\"  code=\""+settings[ind].name+"\" stype=\"2\" >"+defaultValue+"</textarea></br>";															
+														}else if(type==6){
+															if(defaultValue == "true"){
+																defaultValue =" checked=\"checked\" ";
+															}else{
+																defaultValue="";
+															}
+															text = "<p>"+settings[ind].title+"</p><input type=\"checkbox\" name=\"agcats_"+settings[ind].name+"\" class=\"setting\"  code=\""+settings[ind].name+"\" stype=\"6\" "+defaultValue+" /></br>";															
 														}
 														jQuery('#agca_template_settings').prepend(text);
 													}
@@ -2025,7 +2061,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 			<table>
 				<tr valign="left" >
 								<th scope="row">
-                                                                    <label title="If checked, all users will be affected with these changes, except admin. Not checked = apply for all</br></br><strong>Q</strong>: Who is administrator?</br><strong>A</strong>: Go to <i>Advanced</i> tab and change capability option to define admin users." for="agca_role_allbutadmin">Do not apply these settings for Admin&nbsp;&nbsp;</label>
+                                                                    <label title="If checked, all users will be affected with these changes, except admin. Not checked = apply for all</br></br><strong>Q</strong>: Who is administrator?</br><strong>A</strong>: Go to <i>Advanced</i> tab and change capability option to define admin users." for="agca_role_allbutadmin">Do not apply customizations for Administrator&nbsp;&nbsp;</label>
 								</th>
 								<td><input title="If checked, all users will be affected with these changes, except admin. Not checked = apply for all" type="checkbox" name="agca_role_allbutadmin" value="true" <?php if (get_option('agca_role_allbutadmin')==true) echo 'checked="checked" '; echo get_option('agca_role_allbutadmin'); ?> />								
 								</td>
