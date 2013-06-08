@@ -1040,7 +1040,11 @@ function isWPHigherOrEqualThan(targetVersion){
     "3.5.2",
     "3.5.3",
     "3.5.4",
-    "3.6"];
+    "3.6",
+	"3.6.1",
+	"3.6.2",
+	"3.6.3",
+	"3.7"];
     //remove sufixes, beta RC etc
     if (wpversion.indexOf("-")!=-1){
         var parts = wpversion.split("-");
