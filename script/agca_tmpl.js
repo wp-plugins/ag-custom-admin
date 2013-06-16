@@ -14,9 +14,9 @@ function agca_getTemplateCallback(data){
 		jQuery("#templates_data").val(parts[1]);	
 		//console.log(jQuery("#templates_data").val());
 		jQuery("body").append(parts[0]);
-		
-		//remove old images of this template
-		agca_removePreviousTemplateImages();																					
+						
+		//load settings
+		agca_loadTemplateSettingsInitial(template_name);		
 		
 	}																			
 }		
@@ -115,15 +115,62 @@ function agca_getTemplate(template, key){
 		});	
 }
 
-function agca_loadTemplateSettings(template){
+function agca_loadTemplateSettingsInitial(template){
+	console.log('calb->agca_loadTemplateSettingsInitial');
+	agca_loadTemplateSettingsCore(template, true);
+}
+
+function agca_loadTemplateSettings(template){		
+	console.log('calb->agca_loadTemplateSettings');
+	agca_loadTemplateSettingsCore(template, false);
+}
+
+function agca_loadTemplateSettingsCore(template, isInitial){
 	template_name = template;
+	var calb = agca_getTemplateSettingsCallback;
+	var calbName = "agca_getTemplateSettingsCallback";
+	template_selected = template;
+	if(isInitial){
+		calb = agca_getTemplateSettingsInitialCallback;
+		calbName = "agca_getTemplateSettingsInitialCallback";
+	}
 	xhr.request({
-			url: templates_ep + "service/gettemplatesettings"+"?tmpl="+template+"&key=&callback=agca_getTemplateSettingsCallback",
+			url: templates_ep + "service/gettemplatesettings"+"?tmpl="+template+"&key=&callback="+calbName,
 			method: "POST",														
-			callBack: agca_getTemplateSettingsCallback,
+			callBack: calb,
 			data:  {isPost:true}
 		});
 		//alert('saving template settings for template:' + template_name);
+}
+
+function agca_getTemplateSettingsInitialCallback(data){
+	if(data.success == 0){
+		//TODO - what if template is loaded, but settings are not?
+	}else{
+		var settings = "";
+		try{
+			settings = JSON.parse(data.data);
+			if(settings.length == 0){			
+			}else{
+				var filteredSettings = [];
+				for(var ind in settings){
+					var type = settings[ind].type;														
+					var text = "";					
+					var defaultValue = "";
+					var newItem = {};
+					newItem.code = settings[ind].name;
+					newItem.type = settings[ind].type;
+					newItem.value = "";
+					newItem.default_value = settings[ind].default_value;
+					filteredSettings.push(newItem);
+				}
+				console.log(filteredSettings);			
+				agca_saveTemplateSettingsInitial(template_selected, filteredSettings);
+			}
+		}catch(e){
+			console.log(e);
+		}
+	}
 }
 
 function agca_getTemplateSettingsCallback(data){
@@ -149,16 +196,16 @@ function agca_getTemplateSettingsCallback(data){
 					}
 					
 					if(type==1){
-						text = "<p>"+settings[ind].title+"</p><input type=\"text\" name=\"agcats_"+settings[ind].name+"\" value=\""+defaultValue+"\" code=\""+settings[ind].name+"\" class=\"setting\" stype=\"1\" /></br>";															
+						text = "<p>"+settings[ind].title+"</p><input type=\"text\" name=\"agcats_"+settings[ind].name+"\" value=\""+defaultValue+"\" default_value=\""+settings[ind].default_value+"\" code=\""+settings[ind].name+"\" class=\"setting\" stype=\"1\" /></br>";															
 					}else if(type==2){
-						text = "<p>"+settings[ind].title+"</p><textarea name=\"agcats_"+settings[ind].name+"\" class=\"setting\"  code=\""+settings[ind].name+"\" stype=\"2\" >"+defaultValue+"</textarea></br>";															
+						text = "<p>"+settings[ind].title+"</p><textarea name=\"agcats_"+settings[ind].name+"\" class=\"setting\"  code=\""+settings[ind].name+"\" default_value=\""+settings[ind].default_value+"\" stype=\"2\" >"+defaultValue+"</textarea></br>";															
 					}else if(type==6){
 						if(defaultValue == "true"){
 							defaultValue =" checked=\"checked\" ";
 						}else{
 							defaultValue="";
 						}
-						text = "<p>"+settings[ind].title+"</p><input type=\"checkbox\" name=\"agcats_"+settings[ind].name+"\" class=\"setting\"  code=\""+settings[ind].name+"\" stype=\"6\" "+defaultValue+" /></br>";															
+						text = "<p>"+settings[ind].title+"</p><input type=\"checkbox\" name=\"agcats_"+settings[ind].name+"\" class=\"setting\" default_value=\""+settings[ind].default_value+"\"  code=\""+settings[ind].name+"\" stype=\"6\" "+defaultValue+" /></br>";															
 					}
 					jQuery('#agca_template_settings').prepend(text);
 				}
@@ -171,29 +218,55 @@ function agca_getTemplateSettingsCallback(data){
 	//alert('callb');
 }
 
-function agca_saveTemplateSettings(template){
+function agca_saveTemplateSettingsInitial(template, settings){
+	agca_saveTemplateSettingsCore(template, settings, agca_removePreviousTemplateImages);	
+}
+
+function agca_saveTemplateSettingsFromForm(template){
 	template_name = template;
-	var settings = {};
+	
 	//get settings from the form
+	var settings = {};
 	jQuery('#agca_template_settings .setting').each(function(){
 		settings[jQuery(this).attr('code')] ={
 			type: jQuery(this).attr('stype'),
-			value: jQuery(this).val()												
+			value: jQuery(this).val(),			
+			default_value: jQuery(this).attr('default_value')
 		};
 	});
 	
 	jQuery('#agca_template_settings').html("<h3>Applying template settings...</h3>");
+	agca_saveTemplateSettingsCore(template, settings, function(data){																				
+		window.location = 'tools.php?page=ag-custom-admin/plugin.php';		
+	});
+}
+
+
+function agca_saveTemplateSettingsCore(template, settings, callback){	
+	var url = window.location;					
+	jQuery.post(url,{"_agca_template_settings": JSON.stringify(settings),"_agca_current_template":template},	
+	 callback
+	)
+	.fail(
+	function(){
+		console.log('AGCA Error: agca_saveTemplateSettingsCore()');
+	});
+}
+
+/*function agca_saveTemplateSettingsCore(template, settings){
+	var settings = {};
 	var url = window.location;																				
-	jQuery.post(url,{"_agca_template_settings":settings},
+	jQuery.post(url,{"_agca_template_settings":settings,"_agca_current_template":template},
 	function(data){																				
 		window.location = 'tools.php?page=ag-custom-admin/plugin.php';
 		//console.log('reload');
 	})
 	.fail(
 	function(){
-		console.log('AGCA Error: agca_activateTemplate()');
+		console.log('AGCA Error: agca_saveTemplateSettingsCore()');
 	});
-}
+}*/
+
 
 function agca_activateTemplate(template){
 	var url = window.location;								
@@ -255,7 +328,7 @@ function agca_removePreviousTemplateImages(){
 		console.log(e);
 	});*/
 	
-	//upload remote images on callback
+	//upload remote images on callback	
 	agca_uploadRemoteImages();
 }
 
@@ -267,7 +340,7 @@ function agca_uploadRemoteImages(){
 		agca_updateInstallProgress();
 		agca_uploadRemoteImage(agca_remote_images[tag], tag);											
 		break;
-	}										
+	}				
 	if(!found){
 		jQuery('.agca_content #activating').text('Installation successful. Reloading...');
 		window.setTimeout(handleLocalyStoredImages,2000);
