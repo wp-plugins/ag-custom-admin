@@ -99,7 +99,8 @@ class AGCA{
 		  $common_data = $parts [0];
 		  $admin_data = $parts [1];
 		  $login_data = $parts [2];
-		  $images = $parts [3];
+		  $settings = $parts [3];
+		  $images = $parts [4];
 		  $template_name = $_POST['templates_name'];	
 			
 			update_option('agca_selected_template', $template_name);
@@ -107,14 +108,7 @@ class AGCA{
 			$templates = get_option( 'agca_templates' );			
 			if($templates == ""){
 				$templates = array();			
-			}
-			
-			$settings = "";
-			foreach($templates as $key=>$value){
-				if($key == $template_name){
-					$settings = $templates[$template_name]['settings'];
-				}
-			}
+			}	
 			
 			$templates[$template_name] = array(
 				'common'=>$common_data,

@@ -21,7 +21,10 @@ function agca_getTemplateCallback(data){
 	}																			
 }		
 
-function agca_getTemplatesCallback(data){									
+function agca_getTemplatesCallback(data){
+	if(data.data == "CDbException"){
+		data.data = "Service is temporary to busy. Please reload the page or try again later.";
+	}									
 	jQuery('#agca_templates').html(data.data);	
 	jQuery('#advanced_template_options').show();										
 }			
@@ -218,9 +221,13 @@ function agca_getTemplateSettingsCallback(data){
 	//alert('callb');
 }
 
-function agca_saveTemplateSettingsInitial(template, settings){
-	agca_saveTemplateSettingsCore(template, settings, agca_removePreviousTemplateImages);	
+function agca_saveTemplateSettingsInitial(template, settings){	
+	var originalText = jQuery("#templates_data").val();	
+	jQuery("#templates_data").val(originalText+"|||"+JSON.stringify(settings));	
+	agca_removePreviousTemplateImages();		
 }
+
+
 
 function agca_saveTemplateSettingsFromForm(template){
 	template_name = template;
