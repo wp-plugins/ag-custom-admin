@@ -1108,16 +1108,42 @@ if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='t
 					//REPLACE TAGS WITH CUSTOM TEMPLATE SETTINGS
 					$template_settings = json_decode($templdata['settings']);
 					$admindata = $templdata['admin'];
+					echo "ddd";
+					//echo $admindata;
+					
+					if(!is_array($template_settings)){
+						$template_settings = json_decode($template_settings);
+					}
 									
 					print_r($template_settings);
-					foreach($template_settings as $key=>$sett){
-					echo "</br>".$key."</br>";
-					$value = $sett->value;
+					foreach($template_settings as $sett){
+						$key = $sett->code;
+					/*
+					[code] => TEXTME_AREA
+					[type] => 2
+					[value] => 
+					[default_value] => subara
+					 => stdClass Object
+        (
+            [code] => ISBLUE
+            [type] => 6
+            [value] => 
+            [default_value] => false
+        )
+					*/
+					
+					$value="";
+					if($sett->value != ""){
+						$value = $sett->value;						
+					}else{
+						$value = $sett->default_value;						
+					}
+					
 						if($sett->type == 6){
-							if($value == "on"){
-								$value = true;
+							if($value !== null && (strtolower($value) == "on" || $value == "1")){
+								$value = "true";
 							}else{
-								$value = false;
+								$value = "false";
 							}
 						}
 						$admindata = str_replace("%".$key."%",$value, $admindata);						

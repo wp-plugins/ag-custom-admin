@@ -233,13 +233,23 @@ function agca_saveTemplateSettingsFromForm(template){
 	template_name = template;
 	
 	//get settings from the form
-	var settings = {};
+	var settings = [];
 	jQuery('#agca_template_settings .setting').each(function(){
-		settings[jQuery(this).attr('code')] ={
-			type: jQuery(this).attr('stype'),
-			value: jQuery(this).val(),			
-			default_value: jQuery(this).attr('default_value')
-		};
+		var setting_typ = jQuery(this).attr('stype');
+		var setting_val = jQuery(this).val();
+		var setting_cod = jQuery(this).attr('code');
+		var setting_def = jQuery(this).attr('default_value');
+		
+		if(jQuery(this).attr('type')=="checkbox"){
+			setting_val = jQuery(this).is(':checked');
+		}
+		
+		settings.push({
+			type: setting_typ,
+			value: setting_val,			
+			code: setting_cod,
+			default_value: setting_def
+		});
 	});
 	
 	jQuery('#agca_template_settings').html("<h3>Applying template settings...</h3>");
