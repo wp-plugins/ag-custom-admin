@@ -143,7 +143,7 @@ class AGCA{
 			}			
 			$template_name = $_POST["_agca_current_template"];
 			
-			$templates[$template_name]["settings"] = json_encode($settings);
+			$templates[$template_name]["settings"] = $settings;
 			update_option('agca_templates', $templates);
 			
 			$_POST = array();			
@@ -1099,22 +1099,16 @@ if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='t
 					echo ($templdata['common']);
 					echo "<!--AGCAIMAGES: ".$templdata['images']."-->";
 				 if(!((get_option('agca_role_allbutadmin')==true) and  (current_user_can($this->admin_capability())))){	
-					if($templdata['settings'] == "") $templdata['settings'] = "[]";
-					//echo "\n<script type=\"text/javascript\">";
-					//echo "var agca_template_settings = ".$templdata['settings'].";\n";//TODO:  think about to remove
-					//print_r(json_decode($templdata['settings']));
-					//echo "</script>";
+					if($templdata['settings'] == "") $templdata['settings'] = "{}";				
+					
+					echo "\n<script type=\"text/javascript\">";
+					echo "var agca_template_settings = ".$templdata['settings'].";\n";					
+					echo "</script>";
 					
 					//REPLACE TAGS WITH CUSTOM TEMPLATE SETTINGS
 					$template_settings = json_decode($templdata['settings']);
-					$admindata = $templdata['admin'];
-					echo "ddd";
-					//echo $admindata;
-					
-					if(!is_array($template_settings)){
-						$template_settings = json_decode($template_settings);
-					}
-									
+					$admindata = $templdata['admin'];					
+														
 					print_r($template_settings);
 					foreach($template_settings as $sett){
 						$key = $sett->code;
@@ -1132,13 +1126,15 @@ if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='t
         )
 					*/
 					
-					$value="";
-					if($sett->value != ""){
-						$value = $sett->value;						
-					}else{
-						$value = $sett->default_value;						
-					}
-					
+						//use default value if user's value is not set
+						$value="";
+						if($sett->value != ""){
+							$value = $sett->value;						
+						}else{
+							$value = $sett->default_value;						
+						}
+						
+						//Preapare settings					
 						if($sett->type == 6){
 							if($value !== null && (strtolower($value) == "on" || $value == "1")){
 								$value = "true";
@@ -2673,7 +2669,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 							</tr>	
 							<tr>							
 								<td>
-									<div id="advanced_template_options" style="display:block">
+									<div id="advanced_template_options" style="display:none">
 										<h4>Advanced Template Actions</h4>
 										<p style="color:red;"><strong>WARNING:</strong> Use these template actions only if you are experiencing some problems with AGCA templates. With these options you can deactivate or remove all installed templates.</p>
 										<p><a href="javascript:agca_activateTemplate('');">DEACTIVATE ALL TEMPLATES</a> - templates will be deactivated, but still installed.</p>

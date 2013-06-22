@@ -155,7 +155,7 @@ function agca_getTemplateSettingsInitialCallback(data){
 			settings = JSON.parse(data.data);
 			if(settings.length == 0){			
 			}else{
-				var filteredSettings = [];
+				var filteredSettings = {};
 				for(var ind in settings){
 					var type = settings[ind].type;														
 					var text = "";					
@@ -165,9 +165,9 @@ function agca_getTemplateSettingsInitialCallback(data){
 					newItem.type = settings[ind].type;
 					newItem.value = "";
 					newItem.default_value = settings[ind].default_value;
-					filteredSettings.push(newItem);
+					filteredSettings[ind] = newItem;
 				}
-				console.log(filteredSettings);			
+				//console.log(filteredSettings);			
 				agca_saveTemplateSettingsInitial(template_selected, filteredSettings);
 			}
 		}catch(e){
@@ -233,8 +233,9 @@ function agca_saveTemplateSettingsFromForm(template){
 	template_name = template;
 	
 	//get settings from the form
-	var settings = [];
-	jQuery('#agca_template_settings .setting').each(function(){
+	var settings = {};
+	
+	jQuery('#agca_template_settings .setting').each(function(ind){
 		var setting_typ = jQuery(this).attr('stype');
 		var setting_val = jQuery(this).val();
 		var setting_cod = jQuery(this).attr('code');
@@ -244,12 +245,13 @@ function agca_saveTemplateSettingsFromForm(template){
 			setting_val = jQuery(this).is(':checked');
 		}
 		
-		settings.push({
+		settings[ind] = {
 			type: setting_typ,
 			value: setting_val,			
 			code: setting_cod,
 			default_value: setting_def
-		});
+		};
+		
 	});
 	
 	jQuery('#agca_template_settings').html("<h3>Applying template settings...</h3>");
