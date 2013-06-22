@@ -130,9 +130,11 @@ function agca_loadTemplateSettings(template){
 
 function agca_loadTemplateSettingsCore(template, isInitial){
 	template_name = template;
+	template_selected = template;
+	
 	var calb = agca_getTemplateSettingsCallback;
 	var calbName = "agca_getTemplateSettingsCallback";
-	template_selected = template;
+	
 	if(isInitial){
 		calb = agca_getTemplateSettingsInitialCallback;
 		calbName = "agca_getTemplateSettingsInitialCallback";
@@ -163,7 +165,7 @@ function agca_getTemplateSettingsInitialCallback(data){
 					var newItem = {};
 					newItem.code = settings[ind].name;
 					newItem.type = settings[ind].type;
-					newItem.value = "";
+					newItem.value = settings[ind].value;
 					newItem.default_value = settings[ind].default_value;
 					filteredSettings[ind] = newItem;
 				}
@@ -189,28 +191,79 @@ function agca_getTemplateSettingsCallback(data){
 			}else{
 				jQuery('#agca_template_settings .agca_loader').hide();
 				jQuery('#agca_save_template_settings').show();
+				
+				var currentSettings = (agca_template_settings != null && agca_template_settings != undefined)?agca_template_settings:{};
+				
+				//TODO: Change to use object name code object[code], instead of number object[i]
 				for(var ind in settings){
 					var type = settings[ind].type;														
 					var text = "";
 					//console.log(settings[ind]);
-					var defaultValue = "";
-					if(agca_template_settings[settings[ind].name] != undefined){
-						defaultValue = agca_template_settings[settings[ind].name].value;
+					var currentValue = "";				
+					
+					//get previously saved value
+					for(var ind2 in currentSettings){
+						if(currentSettings[ind2].code == settings[ind].name){
+							currentValue = currentSettings[ind2].value;
+						}
 					}
 					
 					if(type==1){
-						text = "<p>"+settings[ind].title+"</p><input type=\"text\" name=\"agcats_"+settings[ind].name+"\" value=\""+defaultValue+"\" default_value=\""+settings[ind].default_value+"\" code=\""+settings[ind].name+"\" class=\"setting\" stype=\"1\" /></br>";															
+						text = "<p>"+settings[ind].title+"</p><input type=\"text\" name=\"agcats_"+settings[ind].name+"\" value=\""+currentValue+"\" default_value=\""+settings[ind].default_value+"\" code=\""+settings[ind].name+"\" class=\"setting\" stype=\"1\" /></br>";															
 					}else if(type==2){
-						text = "<p>"+settings[ind].title+"</p><textarea name=\"agcats_"+settings[ind].name+"\" class=\"setting\"  code=\""+settings[ind].name+"\" default_value=\""+settings[ind].default_value+"\" stype=\"2\" >"+defaultValue+"</textarea></br>";															
-					}else if(type==6){
-						if(defaultValue == "true"){
-							defaultValue =" checked=\"checked\" ";
+						text = "<p>"+settings[ind].title+"</p><textarea name=\"agcats_"+settings[ind].name+"\" class=\"setting\"  code=\""+settings[ind].name+"\" default_value=\""+settings[ind].default_value+"\" stype=\"2\" >"+currentValue+"</textarea></br>";															
+					}else if(type==3){
+						text = "<p>"+settings[ind].title+"</p><select name=\"agcats_"+settings[ind].name+"\" class=\"setting\"  code=\""+settings[ind].name+"\" default_value=\""+settings[ind].default_value+"\" stype=\"3\" >";															
+						var options = settings[ind].default_value.split(',');
+						for(var indopt in options){
+							var sel = "";
+							if(currentValue == options[indopt]){
+								sel = " selected=\"selected\" ";
+							}
+							text+="<option value="+options[indopt]+" "+sel+">"+options[indopt]+"</option>";
+						}						
+						text+="</select>";
+					}else if(type==4){
+						text = "<p>"+settings[ind].title+"</p><div class=\"agca_form_0100_div\"><input value=\""+currentValue+"\" type=\"text\" name=\"agcats_"+settings[ind].name+"\" class=\"setting agca_form_0100\"  code=\""+settings[ind].name+"\" default_value=\""+settings[ind].default_value+"\" stype=\"4\" /><input type=\"button\" name=\"agca_form_decr\" class=\"agca_form_decr\" value=\"-\"/><input type=\"button\" name=\"agca_form_incr\" class=\"agca_form_incr\" value=\"+\"/>&nbsp;(0-100)</div></br>";															
+					}else if(type==6){					
+						if(currentValue == true){
+							currentValue =" checked=\"checked\" ";
 						}else{
-							defaultValue="";
+							currentValue="";
 						}
-						text = "<p>"+settings[ind].title+"</p><input type=\"checkbox\" name=\"agcats_"+settings[ind].name+"\" class=\"setting\" default_value=\""+settings[ind].default_value+"\"  code=\""+settings[ind].name+"\" stype=\"6\" "+defaultValue+" /></br>";															
+						text = "<p>"+settings[ind].title+"</p><input type=\"checkbox\" name=\"agcats_"+settings[ind].name+"\" class=\"setting\" default_value=\""+settings[ind].default_value+"\"  code=\""+settings[ind].name+"\" stype=\"6\" "+currentValue+" /></br>";															
 					}
 					jQuery('#agca_template_settings').prepend(text);
+					
+					//TODO: do similar to options above, clean a code up a litle bit, add them dinamicaly all attributes instead of inline adding
+					jQuery('.agca_form_0100_div .agca_form_decr').click(function(){
+						var val =jQuery(this).parent().find('.agca_form_0100').val();
+						val = parseInt(val.replace(/\D/g,''));//leave only numbers
+						if(isNaN(val)) val =0;
+						val--;
+						if(val < 0)val =0;
+						if(val > 100)val=100;
+						jQuery(this).parent().find('.agca_form_0100').val(val);
+					});
+					jQuery('.agca_form_0100_div .agca_form_incr').click(function(){
+						var val =jQuery(this).parent().find('.agca_form_0100').val();
+						val = parseInt(val.replace(/\D/g,''));//leave only numbers
+						if(isNaN(val)) val =0;
+						val++;
+						if(val < 0)val =0;
+						if(val > 100)val=100;
+						jQuery(this).parent().find('.agca_form_0100').val(val);
+					});
+					jQuery('.agca_form_0100').keyup(function(){
+						
+						var val =jQuery(this).val();
+						val = parseInt(val.replace(/\D/g,''));//leave only numbers
+						if(val < 0 || isNaN(val))val =0;
+						if(val > 100)val=100;
+						
+						jQuery(this).val(val);
+						
+					});
 				}
 				jQuery('#agca_template_settings').prepend("<h3>Additional template options:</h3>");
 			}
