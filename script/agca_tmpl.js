@@ -148,16 +148,16 @@ function agca_loadTemplateSettingsCore(template, isInitial){
 		//alert('saving template settings for template:' + template_name);
 }
 
-function agca_getTemplateSettingsInitialCallback(data){
+function agca_getTemplateSettingsInitialCallback(data){ console.log(data);
 	if(data.success == 0){
 		//TODO - what if template is loaded, but settings are not?
 	}else{
 		var settings = "";
+		var filteredSettings = {};
 		try{
 			settings = JSON.parse(data.data);
 			if(settings.length == 0){			
-			}else{
-				var filteredSettings = {};
+			}else{				
 				for(var ind in settings){
 					var type = settings[ind].type;														
 					var text = "";					
@@ -169,12 +169,14 @@ function agca_getTemplateSettingsInitialCallback(data){
 					newItem.default_value = settings[ind].default_value;
 					filteredSettings[ind] = newItem;
 				}
-				//console.log(filteredSettings);			
-				agca_saveTemplateSettingsInitial(template_selected, filteredSettings);
+				console.log(template_selected);			
+				console.log(filteredSettings);		
+				
 			}
 		}catch(e){
 			console.log(e);
 		}
+		agca_saveTemplateSettingsInitial(template_selected, filteredSettings);
 	}
 }
 
@@ -264,8 +266,7 @@ function agca_getTemplateSettingsCallback(data){
 						jQuery(this).val(val);
 						
 					});
-				}
-				jQuery('#agca_template_settings').prepend("<h3>Additional template options:</h3>");
+				}				
 			}
 		}catch(e){
 			console.log(e);
