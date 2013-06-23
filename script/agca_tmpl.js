@@ -24,7 +24,9 @@ function agca_getTemplateCallback(data){
 function agca_getTemplatesCallback(data){
 	if(data.data == "CDbException"){
 		data.data = "Service is temporary to busy. Please reload the page or try again later.";
-	}									
+	}else if(data.data == "PHP Error"){
+		data.data = "Error occurred on the server.";
+	}	
 	jQuery('#agca_templates').html(data.data);	
 	jQuery('#advanced_template_options').show();										
 }			
