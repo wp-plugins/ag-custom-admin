@@ -81,6 +81,6 @@
 				
 				delete_option( 'agca_selected_template' );
                 delete_option( 'agca_templates' );
-				
+				delete_option( 'agca_disablewarning' );	
 				
 ?>
