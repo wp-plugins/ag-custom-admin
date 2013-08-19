@@ -4,7 +4,9 @@ var templates_installed = [];
 var xhr =null;
 var agcaLoadingTimeOut = null;
 
-function agca_getTemplateCallback(data){										
+function agca_getTemplateCallback(data){	
+	agcaDebug('FN:agca_getTemplateCallback()');
+	agcaDebug(JSON.stringify(data));
 	if(data.success == 0){
 		alert(data.data);
 		jQuery('#agca_template_popup').hide();
@@ -16,12 +18,12 @@ function agca_getTemplateCallback(data){
 		jQuery("body").append(parts[0]);
 						
 		//load settings
-		agca_loadTemplateSettingsInitial(template_name);		
-		
+		agca_loadTemplateSettingsInitial(template_name);	
 	}																			
 }		
 
 function agca_getTemplatesCallback(data){
+	agcaDebug('FN:agca_getTemplatesCallback()');
 	if(data.data == "CDbException"){
 		data.data = "Service is temporary to busy. Please reload the page or try again later.";
 	}else if(data.data == "PHP Error"){
@@ -31,12 +33,14 @@ function agca_getTemplatesCallback(data){
 	jQuery('#advanced_template_options').show();										
 }			
 function agca_client_init(){
+	agcaDebug('FN:agca_client_init()');
 	agca_getLocalTemplates();
 	checkIfTemplatesAreLoaded(1);
 	jQuery('#agca_templates').html('<p class="initialLoader" style="font-size:18px;color:gray;font-style:italic">Loading templates...</p>');										
 }
 
-function agca_setupXHR(){									
+function agca_setupXHR(){			
+	agcaDebug('FN:agca_setupXHR()');
 	if(xhr != null) return false;																				
 	xhr = new easyXDM.Rpc({
 	remote:templates_ep
@@ -71,7 +75,7 @@ function agca_setupXHR(){
 }
 
 function agca_getTemplates(){
-
+	agcaDebug('FN:agca_getTemplates()');
 //agca_uploadRemoteImage('http://www.neowing.co.jp/idol_site2/image/FDGD-21/fdgd-21-top.jpg');	
 	agca_setupXHR();									
 	xhr.request({
@@ -85,6 +89,7 @@ function agca_getTemplates(){
 }
 
 function agca_getConfiguration(){
+	agcaDebug('FN:agca_getConfiguration()');
 	/*xhr.request({
 			url: templates_ep + "/configuration" + "?callback=agca_getConfigurationCallback",
 			method: "POST",														
@@ -111,6 +116,7 @@ function agca_getConfiguration(){
 }
 
 function agca_getTemplate(template, key){
+	agcaDebug('FN:agca_getTemplate()');
 	template_name = template;
 	xhr.request({
 			url: templates_ep + "service/gettemplate"+"?tmpl="+template+"&key="+key+"&callback=agca_getTemplateCallback",
@@ -121,16 +127,17 @@ function agca_getTemplate(template, key){
 }
 
 function agca_loadTemplateSettingsInitial(template){
-	console.log('calb->agca_loadTemplateSettingsInitial');
+	agcaDebug('FN:agca_loadTemplateSettingsInitial()');	
 	agca_loadTemplateSettingsCore(template, true);
 }
 
 function agca_loadTemplateSettings(template){		
-	console.log('calb->agca_loadTemplateSettings');
+	agcaDebug('FN:agca_loadTemplateSettings()');
 	agca_loadTemplateSettingsCore(template, false);
 }
 
 function agca_loadTemplateSettingsCore(template, isInitial){
+	agcaDebug('FN:agca_loadTemplateSettingsCore()');
 	template_name = template;
 	template_selected = template;
 	
@@ -150,10 +157,13 @@ function agca_loadTemplateSettingsCore(template, isInitial){
 		//alert('saving template settings for template:' + template_name);
 }
 
-function agca_getTemplateSettingsInitialCallback(data){ console.log(data);
+function agca_getTemplateSettingsInitialCallback(data){ 
+	agcaDebug('FN:agca_getTemplateSettingsInitialCallback()');
+    agcaDebug(JSON.stringify(data));
 	if(data.success == 0){
 		//TODO - what if template is loaded, but settings are not?
-	}else{
+		console.log('ERR:template settings are not loaded');
+	}else{		
 		var settings = "";
 		var filteredSettings = {};
 		try{
@@ -171,22 +181,25 @@ function agca_getTemplateSettingsInitialCallback(data){ console.log(data);
 					newItem.default_value = settings[ind].default_value;
 					filteredSettings[ind] = newItem;
 				}
-				console.log(template_selected);			
+				agcaDebug("Selected template:" + template_selected);			
 				console.log(filteredSettings);		
 				
 			}
 		}catch(e){
+			console.log('Error while loading settings');
 			console.log(e);
-		}
+		}		
 		agca_saveTemplateSettingsInitial(template_selected, filteredSettings);
 	}
 }
 
 function agca_getTemplateSettingsCallback(data){
+	agcaDebug('FN:agca_getTemplateSettingsCallback()');	
+	
 	if(data.success == 0){
 		//alert(data.data);
 		jQuery('#agca_template_settings .agca_loader').html(data.data);
-	}else{
+	}else{		
 		var settings = "";
 		try{
 			settings = JSON.parse(data.data);
@@ -278,6 +291,7 @@ function agca_getTemplateSettingsCallback(data){
 }
 
 function agca_saveTemplateSettingsInitial(template, settings){	
+	agcaDebug('FN:agca_saveTemplateSettingsInitial()');
 	var originalText = jQuery("#templates_data").val();	
 	jQuery("#templates_data").val(originalText+"|||"+JSON.stringify(settings));	
 	agca_removePreviousTemplateImages();		
@@ -286,6 +300,7 @@ function agca_saveTemplateSettingsInitial(template, settings){
 
 
 function agca_saveTemplateSettingsFromForm(template){
+	agcaDebug('FN:agca_saveTemplateSettingsFromForm()');
 	template_name = template;
 	
 	//get settings from the form
@@ -317,7 +332,8 @@ function agca_saveTemplateSettingsFromForm(template){
 }
 
 
-function agca_saveTemplateSettingsCore(template, settings, callback){	
+function agca_saveTemplateSettingsCore(template, settings, callback){
+	agcaDebug('FN:agca_saveTemplateSettingsCore()');
 	var url = window.location;					
 	jQuery.post(url,{"_agca_template_settings": JSON.stringify(settings),"_agca_current_template":template},	
 	 callback
@@ -344,6 +360,7 @@ function agca_saveTemplateSettingsCore(template, settings, callback){
 
 
 function agca_activateTemplate(template){
+	agcaDebug('FN:agca_activateTemplate('+template+')');
 	var url = window.location;								
 	jQuery.post(url,{"_agca_activate_template":template},
 	function(data){																				
@@ -356,15 +373,18 @@ function agca_activateTemplate(template){
 }							
 
 function agca_removeAllTemplates(){
+	agcaDebug('FN:agca_removeAllTemplates()');
 	yesnoPopup("Are you sure? All installed templates will be removed?",agca_removeAllTemplatesConfirmed);										
 }
 
 function agca_removeAllTemplatesConfirmed(){
+	agcaDebug('FN:agca_removeAllTemplatesConfirmed()');
 	window.location = 'tools.php?page=ag-custom-admin/plugin.php&agca_action=remove_templates';										
 }
 
 function handleLocalyStoredImages(){
-console.log(jQuery("#templates_data").val());
+	agcaDebug('FN:handleLocalyStoredImages()');
+	agcaDebug(jQuery("#templates_data").val());
 	var originalText = jQuery("#templates_data").val();
 	var serializedImages = "";
 	for(var tag in agca_local_images){												
@@ -379,11 +399,12 @@ console.log(jQuery("#templates_data").val());
 	jQuery("#templates_data").val(originalText+"|||"+serializedImages);
 	//console.log(jQuery("#templates_data").val());
 	
-	//save finally
+	//SAVE FINALY
 	jQuery("#agca_templates_form").submit();	
 }
 
 function agca_updateInstallProgress(){
+	agcaDebug('FN:agca_updateInstallProgress()');
 	agca_local_images_count++;
 	var current = agca_remote_images_count - agca_local_images_count;
 	var text = agca_local_images_count +"/" + (parseInt(agca_remote_images_count)-1);
@@ -391,7 +412,8 @@ function agca_updateInstallProgress(){
 	jQuery('.agca_content #activating').text('Installing ('+text+') ...');
 }
 
-function agca_removePreviousTemplateImages(){								    
+function agca_removePreviousTemplateImages(){	
+	agcaDebug('FN:agca_removePreviousTemplateImages()');
 	/*var url = window.location;								
 	jQuery.post(url,{"_agca_remove_template_images":template_name},
 		function(data){																				
@@ -402,19 +424,22 @@ function agca_removePreviousTemplateImages(){
 		console.log('AGCA Error: agca_removePreviousTemplateImages()');
 		console.log(e);
 	});*/
-	
+	agcaDebug('templates data');
+	agcaDebug(jQuery("#templates_data").val());
 	//upload remote images on callback	
 	if(typeof agca_remote_images != 'undefined'){
 		agca_uploadRemoteImages();
 	}else{
 		//TODO test moday with 1B1F1F37-6DEB-61FB-B24A-D2E122A69575
 		jQuery("#templates_data").val(jQuery("#templates_data").val()+"|||");
-		//jQuery("#agca_templates_form").submit();
+		
+		//SAVE FINALY PAYED
+		jQuery("#agca_templates_form").submit();		
 	}	
 }
 
 function agca_uploadRemoteImages(){									
-
+    agcaDebug('FN:agca_uploadRemoteImages()');
 	var found = false;
 	for(var tag in agca_remote_images){
 		found = true;
@@ -429,6 +454,7 @@ function agca_uploadRemoteImages(){
 }
 
 function agca_uploadRemoteImage(remoteUrl, tag){
+	agcaDebug('FN:agca_uploadRemoteImage('+remoteUrl+', '+tag+')');
 	var url = window.location;								
 	jQuery.post(url,{"_agca_upload_image":remoteUrl},
 	function(data){																				
@@ -445,6 +471,7 @@ function agca_uploadRemoteImage(remoteUrl, tag){
 }
 
 function agca_getLocalTemplates(){
+	agcaDebug("FN:agca_getLocalTemplates()");
 	var url = window.location;
 	jQuery.post(url,{"_agca_get_templates":true},
 	function(data){										
@@ -459,7 +486,8 @@ function agca_getLocalTemplates(){
 		console.log('AGCA Error: agca_getLocalTemplates()');
 	});
 }		
-function agca_error(data){										
+function agca_error(data){
+	agcaDebug("FN:agca_error()");
 	clearTimeout(agcaLoadingTimeOut);
 	if(jQuery('#agca_templates p:first').hasClass('initialLoader')){
 			jQuery('#agca_templates p:first').text('Unable to load templates. Please submit this error to AGCA support. Thank you!');										
@@ -469,6 +497,7 @@ function agca_error(data){
 
 //check if templates loaded
 function checkIfTemplatesAreLoaded(pass){
+	agcaDebug('FN:checkIfTemplatesAreLoaded('+pass+')');
 	if(pass == 1){
 		agcaLoadingTimeOut = window.setTimeout(function(){
 		if(jQuery('#agca_templates p:first').hasClass('initialLoader')){
@@ -498,6 +527,7 @@ function checkIfTemplatesAreLoaded(pass){
 		agcaLoadingTimeOut = window.setTimeout(function(){
 		if(jQuery('#agca_templates p:first').hasClass('initialLoader')){
 			jQuery('#agca_templates p:first').text('Sorry, unable to load templates right now. Please try again later.');
+			agcaDebug('ERR:Unable to load templates');
 		}
 		},10000);
 	}										

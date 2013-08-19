@@ -29,12 +29,12 @@ class AGCA{
 	private $colorizer="";	
 	private $active_plugin;
 	private $agca_version;    
-	private $agca_debug = false;    
+	private $agca_debug = true;    
 	private $admin_capabilities;    	
     private $context = "";
     private $saveAfterImport = false;	
-	//private $templates_ep = "http://agca.argonius.com/configuration.php";
-	private $templates_ep = "http://agca.argonius.com/debug.php";
+	private $templates_ep = "http://agca.argonius.com/configuration.php";
+	//private $templates_ep = "http://agca.argonius.com/debug.php";
 	public function __construct()
 	{   	        			
         $this->reloadScript();		
@@ -711,6 +711,7 @@ class AGCA{
                  <script type="text/javascript">      
                     var wpversion = "<?php echo $wpversion; ?>";
                     var agca_version = "<?php echo $this->agca_version; ?>";
+					var agca_debug = <?php echo ($this->agca_debug)?"true":"false"; ?>;
                     var jQueryScriptOutputted = false;
                     var agca_context = "page";
                     function initJQuery() {
@@ -1089,6 +1090,7 @@ class AGCA{
 document.write('<style type="text/css">html{visibility:hidden;}</style>');
 <?php $this->finalErrorCheck(); ?>
 var wpversion = "<?php echo $wpversion; ?>";
+var agca_debug = <?php echo ($this->agca_debug)?"true":"false"; ?>;
 var agca_version = "<?php echo $this->agca_version; ?>";
 var errors = false;
 var isSettingsImport = false;
@@ -1122,23 +1124,10 @@ if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='t
 					$template_settings = json_decode($templdata['settings']);
 					$admindata = $templdata['admin'];					
 														
-					print_r($template_settings);
+					//print_r($template_settings);
 					foreach($template_settings as $sett){
 						$key = $sett->code;
-					/*
-					[code] => TEXTME_AREA
-					[type] => 2
-					[value] => 
-					[default_value] => subara
-					 => stdClass Object
-        (
-            [code] => ISBLUE
-            [type] => 6
-            [value] => 
-            [default_value] => false
-        )
-					*/
-					
+										
 						//use default value if user's value is not set
 						$value="";
 						if($sett->value != ""){
@@ -1157,6 +1146,15 @@ if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='t
 						}
 						$admindata = str_replace("%".$key."%",$value, $admindata);						
 					}
+					
+					/*enable special CSS for this WP version*/
+					$admindata = str_replace("/*".$wpversion," ", $admindata);
+					$admindata = str_replace($wpversion."*/"," ", $admindata);
+					
+					//remove CSS comments
+					$admindata = preg_replace('#/\*.*?\*/#si','',$admindata);
+					
+					
 					echo $admindata;
 					//REPLACE TAGS WITH CUSTOM TEMPLATE SETTINGS
 					
@@ -1574,6 +1572,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 		 <?php $this->finalErrorCheck(); ?>
 		 var agca_version = "<?php echo $this->agca_version; ?>";
 		 var wpversion = "<?php echo $wpversion; ?>";
+		 var agca_debug = <?php echo ($this->agca_debug)?"true":"false"; ?>;
                  var isSettingsImport = false;
                  var agca_context = "login";
 				 

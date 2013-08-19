@@ -9,6 +9,16 @@ function booleanToChecked(bool){
     }
 }
 
+function agcaLog(text){
+	console.log(text);
+}
+
+function agcaDebug(text){
+	if(agca_debug){
+		console.log('- '+text);
+	}
+}
+
 function hideShowSubmenus(index){
 	
     var finish = false;
