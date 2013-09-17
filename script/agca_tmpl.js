@@ -23,14 +23,17 @@ function agca_getTemplateCallback(data){
 }		
 
 function agca_getTemplatesCallback(data){
-	agcaDebug('FN:agca_getTemplatesCallback()');
+	agcaDebug('FN:agca_getTemplatesCallback()');	
 	if(data.data == "CDbException"){
 		data.data = "Service is temporary to busy. Please reload the page or try again later.";
+		agcaDebugObj(data);
 	}else if(data.data == "PHP Error"){
 		data.data = "Error occurred on the server.";
+		agcaDebugObj(data);
 	}	
 	jQuery('#agca_templates').html(data.data);	
-	jQuery('#advanced_template_options').show();										
+	jQuery('#advanced_template_options').show();	
+	jQuery(".template img").each(agcaApplyTooltip);
 }			
 function agca_client_init(){
 	agcaDebug('FN:agca_client_init()');
@@ -249,6 +252,17 @@ function agca_getTemplateSettingsCallback(data){
 							currentValue="";
 						}
 						text = "<p>"+settings[ind].title+"</p><input type=\"checkbox\" name=\"agcats_"+settings[ind].name+"\" class=\"setting\" default_value=\""+settings[ind].default_value+"\"  code=\""+settings[ind].name+"\" stype=\"6\" "+currentValue+" /></br>";															
+					}else if(type==7){
+						text = "<p>"+settings[ind].title+"</p><div name=\"agcats_"+settings[ind].name+"\" class=\"setting\" code=\""+settings[ind].name+"\" default_value=\""+settings[ind].default_value+"\" stype=\"7\" style=\"margin-left: 10px;\">";															
+						var options = settings[ind].default_value.split(',');
+						for(var indopt in options){
+							var sel = "";
+							if(currentValue == options[indopt]){
+								sel = " checked ";
+							}
+							text+="<input name=\"agcats_"+settings[ind].name+"_val\" style=\"margin:5px;margin-right:6px;\" type=\"radio\" value="+options[indopt]+" "+sel+" name=\"sd\"/>"+options[indopt]+"</br>";
+						}						
+						text+="</div>";
 					}
 					jQuery('#agca_template_settings').prepend(text);
 					
@@ -314,6 +328,11 @@ function agca_saveTemplateSettingsFromForm(template){
 		
 		if(jQuery(this).attr('type')=="checkbox"){
 			setting_val = jQuery(this).is(':checked');
+		}
+		
+		//radio	
+		if(setting_typ == "7"){			
+			setting_val = jQuery('input[name="agcats_'+setting_cod+'_val"]:checked').val();		
 		}
 		
 		settings[ind] = {

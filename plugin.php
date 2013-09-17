@@ -220,7 +220,9 @@ class AGCA{
                         </script>
 			<link rel="stylesheet" type="text/css" href="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ?>style/ag_style.css?ver=<?php echo $this->agca_version; ?>" />                       
 			<script type="text/javascript" src="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ?>script/ag_script.js?ver=<?php echo $this->agca_version; ?>"></script>	                        	
-                        
+            <?php if($this->context == "admin"){ ?>
+				<script type="text/javascript" src="../wp-includes/js/tinymce/tiny_mce.js"></script>			
+			<?php } ?>       
                        <?php
                         if(!((get_option('agca_role_allbutadmin')==true) and  (current_user_can($this->admin_capability())))){	
                             ?>
@@ -462,6 +464,20 @@ class AGCA{
 				'agca_templates',
             ); 
         }  
+		
+		function getTextEditor($name){
+				$settings = array(
+				'textarea_name' => $name,				
+				'media_buttons' => true,				
+				'tinymce' => array(							
+					'theme_advanced_buttons1' => 'formatselect,|,bold,italic,underline,|,' .
+						'bullist,blockquote,|,justifyleft,justifycenter' .
+						',justifyright,justifyfull,|,link,unlink,|' .
+						',spellchecker,wp_fullscreen,wp_adv'
+				)
+			);
+			wp_editor( get_option($name), $name, $settings );
+		}
         
         function importSettings($settings){
             $exploaded = explode("|^|^|", $settings);
@@ -1458,7 +1474,9 @@ try
 															
 															i++;
 															var selector = '#' + topmenuitem + ' ul li';
-															//console.log(i+" "+checkboxes);													
+															var hoverPopupSelector = '#' + topmenuitem + ' .wp-submenu.wp-submenu-wrap';
+															//console.log(i+" "+checkboxes);	
+																var allSubmenuItemsHidden = true;															
 																while((i<checkboxes.length) && (checkboxes[i][0].indexOf("<-TOP->") < 0)){															
 																	jQuery(selector).each(function(){ //loop through all submenus	
                                                                                                                                             var currentItemText = "";                                                                                                                                           
@@ -1476,12 +1494,17 @@ try
                                                                                                                                                    
 																			if((checkboxes[i][1] == "true") || (checkboxes[i][1] == "checked")){
 																				jQuery(this).addClass('noclass');
+																			}else{
+																				allSubmenuItemsHidden = false;
 																			}
 																			jQuery(this).find('a').text(textboxes[i][1]);																			
 																		}
 																	});
 																	i++;
-																}						
+																}
+																if(allSubmenuItemsHidden){
+																	jQuery(hoverPopupSelector).hide();
+																}																
 														};
 													}												
 												}
@@ -1759,9 +1782,9 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 				<li class="normal"><a href="#dashboad-page-settings" title="Settings for Dashboard page">Dashboard Page</a></li>
 				<li class="normal"><a href="#login-page-settings" title="Settings for Login page">Login Page</a></li>
 				<li class="normal" ><a href="#admin-menu-settings" title="Settings for main admin menu">Admin Menu</a></li>
-				<li class="normal"><a href="#ag-colorizer-setttings" title="AG colorizer settings">Colorizer</a></li>
-				<li class="normal"><a href="#ag-templates" title="Predefined Templates">Templates</a></li>
+				<li class="normal"><a href="#ag-colorizer-setttings" title="AG colorizer settings">Colorizer</a></li>				
                 <li class="normal"><a href="#ag-advanced" title="My custom scripts">Advanced</a></li>
+				<li class="normal" style=""><a style="color:#DB6014;font-weight:bolder;" href="#ag-templates" title="AG Custom Admin Templates">Templates</a></li>
 								
 				<li style="background:none;border:none;padding:0;"><a id="agca_donate_button" target="_blank" style="margin-left:8px" title="Like this plugin? You can support its future development by giving a donation by your wish " href="http://agca.argonius.com/ag-custom-admin/support-for-future-development"><img alt="Donate" src="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ?>images/btn_donate_LG.gif" /></a>
 				</li>                                
@@ -2139,8 +2162,8 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 								<th scope="row">
 									<label title="Adds custom text (or HTML) between heading and widgets area on Dashboard page" for="agca_dashboard_text_paragraph">Add custom Dashboard content<br> <em>(text or HTML content)</em></label>
 								</th>
-								<td>
-								<textarea title="Adds custom text or HTML between heading and widgets area on Dashboard page" rows="5" name="agca_dashboard_text_paragraph" cols="40"><?php echo htmlspecialchars(get_option('agca_dashboard_text_paragraph')); ?></textarea>
+								<td class="agca_editor">								
+								<?php $this->getTextEditor('agca_dashboard_text_paragraph'); ?>		
 								</td>
 							</tr>
 							<?php /* DEPRECATED 1.2
@@ -2769,5 +2792,5 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 	}
 }
 //<link rel="stylesheet" type="text/css" href="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ? >style/agca.css" /> 
-//<link rel="stylesheet" type="text/css" href="http://localhost/wp/351/wp-content/plugins/ag-custom-admin/style/agca.css" />   
+//<link rel="stylesheet" type="text/css" href="http://localhost/wp/351/wp-content/plugins/ag-custom-admin/style/agca.css" />
 ?>

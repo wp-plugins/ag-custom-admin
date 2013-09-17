@@ -19,6 +19,12 @@ function agcaDebug(text){
 	}
 }
 
+function agcaDebugObj(obj){
+	if(agca_debug){
+		console.log(obj);
+	}
+}
+
 function hideShowSubmenus(index){
 	
     var finish = false;
@@ -440,7 +446,53 @@ jQuery(document).ready(function(){
     setTimeout(function(){
         jQuery('#agca_advertising').show(),700
         });
-});		
+});	
+/*ToolTip*/
+function agcaApplyTooltip(){ 
+	if(jQuery(this).attr('title') != ""){
+        jQuery(this).hover(function(e) {
+            if(jQuery(this).hasClass('feedback')){
+               jQuery(this).mousemove(function(e) {			
+                var tipY = e.pageY + 16; 
+                var tipX = e.pageX - 236;	
+                var type = '#fee6e6';
+                var border = '1px solid red';
+                if(jQuery(this).hasClass('positive')) {
+                    type = '#eafee6';
+                    border = '1px solid green';
+                }
+                jQuery("#AGToolTipDiv").css({
+                    'top': tipY, 
+                    'left': tipX,
+                    'background': type,
+                    'border': border
+                });
+            }); 
+            }else{
+                jQuery(this).mousemove(function(e) {			
+                var tipY = e.pageY + 16; 
+                var tipX = e.pageX + 16;	
+                jQuery("#AGToolTipDiv").css({
+                    'top': tipY, 
+                    'left': tipX,
+                    'background': '#FFFFD4',
+                    'border': '1px solid #FFFF00'
+                });
+            });                
+            }            
+			jQuery("#AGToolTipDiv")
+			.html(jQuery(this).attr('title'))
+			.stop(true,true)
+			.fadeIn("fast");
+			jQuery(this).removeAttr('title');			          
+        }, function() {
+            jQuery("#AGToolTipDiv")
+            .stop(true,true)
+            .fadeOut("fast");
+            jQuery(this).attr('title', jQuery("#AGToolTipDiv").html());
+        });
+	}
+}	
 
 jQuery(document).ready(function(){	
     /*Add click handler on main buttons*/
@@ -475,50 +527,7 @@ jQuery(document).ready(function(){
     jQuery("body").append("<div id='AGToolTipDiv'></div>");	
 	
     /*ToolTip*/
-    jQuery("label[title],#agca_donate_button, a.feedback").each(function() {  
-        jQuery(this).hover(function(e) {
-            if(jQuery(this).hasClass('feedback')){
-               jQuery(this).mousemove(function(e) {			
-                var tipY = e.pageY + 16; 
-                var tipX = e.pageX - 236;	
-                var type = '#fee6e6';
-                var border = '1px solid red';
-                if(jQuery(this).hasClass('positive')) {
-                    type = '#eafee6';
-                    border = '1px solid green';
-                }
-                jQuery("#AGToolTipDiv").css({
-                    'top': tipY, 
-                    'left': tipX,
-                    'background': type,
-                    'border': border
-                });
-            }); 
-            }else{
-                jQuery(this).mousemove(function(e) {			
-                var tipY = e.pageY + 16; 
-                var tipX = e.pageX + 16;	
-                jQuery("#AGToolTipDiv").css({
-                    'top': tipY, 
-                    'left': tipX,
-                    'background': '#FFFFD4',
-                    'border': '1px solid #FFFF00'
-                });
-            });                
-            }
-            
-            jQuery("#AGToolTipDiv")
-            .html(jQuery(this).attr('title'))
-            .stop(true,true)
-            .fadeIn("fast");
-            jQuery(this).removeAttr('title');
-        }, function() {
-            jQuery("#AGToolTipDiv")
-            .stop(true,true)
-            .fadeOut("fast");
-            jQuery(this).attr('title', jQuery("#AGToolTipDiv").html());
-        });
-    });
+    jQuery("label[title],#agca_donate_button, a.feedback").each(agcaApplyTooltip);
 	  
     /*SECTION FOCUS*/
     jQuery('.section_title').focus(function(){			  
