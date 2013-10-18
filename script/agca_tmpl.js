@@ -80,15 +80,14 @@ function agca_setupXHR(){
 function agca_getTemplates(){
 	agcaDebug('FN:agca_getTemplates()');
 //agca_uploadRemoteImage('http://www.neowing.co.jp/idol_site2/image/FDGD-21/fdgd-21-top.jpg');	
-	agca_setupXHR();									
+	agca_setupXHR();			
+	
 	xhr.request({
-			url: templates_ep + "service/client" + "?callback=agca_getTemplatesCallback",
+			url: templates_ep + "service/client" + "&callback=agca_getTemplatesCallback",
 			method: "POST",														
 			callBack: agca_getTemplatesCallback,
 			data: {isPost:true}
-		});	
-		
-			
+		});		
 }
 
 function agca_getConfiguration(){
@@ -122,7 +121,7 @@ function agca_getTemplate(template, key){
 	agcaDebug('FN:agca_getTemplate()');
 	template_name = template;
 	xhr.request({
-			url: templates_ep + "service/gettemplate"+"?tmpl="+template+"&key="+key+"&callback=agca_getTemplateCallback",
+			url: templates_ep + "service/gettemplate"+"&tmpl="+template+"&key="+key+"&callback=agca_getTemplateCallback",
 			method: "POST",														
 			callBack: agca_getTemplateCallback,
 			data:  {isPost:true}
@@ -152,7 +151,7 @@ function agca_loadTemplateSettingsCore(template, isInitial){
 		calbName = "agca_getTemplateSettingsInitialCallback";
 	}
 	xhr.request({
-			url: templates_ep + "service/gettemplatesettings"+"?tmpl="+template+"&key=&callback="+calbName,
+			url: templates_ep + "service/gettemplatesettings"+"&tmpl="+template+"&key=&callback="+calbName,
 			method: "POST",														
 			callBack: calb,
 			data:  {isPost:true}
@@ -545,7 +544,7 @@ function checkIfTemplatesAreLoaded(pass){
 	else if(pass == 4){
 		agcaLoadingTimeOut = window.setTimeout(function(){
 		if(jQuery('#agca_templates p:first').hasClass('initialLoader')){
-			jQuery('#agca_templates p:first').text('Sorry, unable to load templates right now. Please try again later.');
+			jQuery('#agca_templates p:first').html('Sorry, unable to load templates right now. Please try again later.</br>We recommend using only latest browsers for template management.');
 			agcaDebug('ERR:Unable to load templates');
 		}
 		},10000);
