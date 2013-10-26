@@ -22,7 +22,7 @@ Author URI: http://www.argonius.com/
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-	
+
 $agca = new AGCA();
 
 class AGCA{
@@ -253,7 +253,7 @@ class AGCA{
 	function reloadScript(){
             if(in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) || WP_ADMIN == 1){              			
 				add_action('init', array(&$this,'agca_enqueue_scripts'));				
-            }             
+            }
 	}
 	
 	function agca_register_settings() {	
@@ -274,7 +274,7 @@ class AGCA{
 		register_setting( 'agca-options-group', 'agca_header_logo_custom' );
 		register_setting( 'agca-options-group', 'agca_wp_logo_custom' );
 		register_setting( 'agca-options-group', 'agca_remove_site_link' );
-                register_setting( 'agca-options-group', 'agca_wp_logo_custom_link' );
+        register_setting( 'agca-options-group', 'agca_wp_logo_custom_link' );
                 
 		register_setting( 'agca-options-group', 'agca_site_heading' );
 		register_setting( 'agca-options-group', 'agca_custom_site_heading' );
@@ -290,13 +290,13 @@ class AGCA{
 		register_setting( 'agca-options-group', 'agca_login_photo_remove' );
 		register_setting( 'agca-options-group', 'agca_login_photo_url' );
 		register_setting( 'agca-options-group', 'agca_login_photo_href' );
-                register_setting( 'agca-options-group', 'agca_login_round_box' );
+        register_setting( 'agca-options-group', 'agca_login_round_box' );
 		register_setting( 'agca-options-group', 'agca_login_round_box_size' );		
 		
 		register_setting( 'agca-options-group', 'agca_dashboard_icon' );
 		register_setting( 'agca-options-group', 'agca_dashboard_text' );
 		register_setting( 'agca-options-group', 'agca_dashboard_text_paragraph' );
-                register_setting( 'agca-options-group', 'agca_dashboard_widget_welcome' );
+        register_setting( 'agca-options-group', 'agca_dashboard_widget_welcome' );
 		register_setting( 'agca-options-group', 'agca_dashboard_widget_rc' );	
 		register_setting( 'agca-options-group', 'agca_dashboard_widget_il' );	
 		register_setting( 'agca-options-group', 'agca_dashboard_widget_plugins' );	
@@ -335,19 +335,20 @@ class AGCA{
 		register_setting( 'agca-options-group', 'agca_admin_menu_separator_second' );	
 		register_setting( 'agca-options-group', 'agca_admin_menu_icons' );	
 		register_setting( 'agca-options-group', 'agca_admin_menu_collapse_button' );
-                register_setting( 'agca-options-group', 'agca_admin_menu_arrow' );
-                register_setting( 'agca-options-group', 'agca_admin_menu_submenu_round' );	
-                register_setting( 'agca-options-group', 'agca_admin_menu_submenu_round_size' );
-                register_setting( 'agca-options-group', 'agca_admin_menu_brand' );
-                register_setting( 'agca-options-group', 'agca_admin_menu_brand_link' );                
+        register_setting( 'agca-options-group', 'agca_admin_menu_arrow' );
+        register_setting( 'agca-options-group', 'agca_admin_menu_submenu_round' );	
+        register_setting( 'agca-options-group', 'agca_admin_menu_submenu_round_size' );
+        register_setting( 'agca-options-group', 'agca_admin_menu_brand' );
+        register_setting( 'agca-options-group', 'agca_admin_menu_brand_link' ); 
+		register_setting( 'agca-options-group', 'agca_admin_menu_always_unfolded' );		
 		register_setting( 'agca-options-group', 'ag_edit_adminmenu_json' );
 		register_setting( 'agca-options-group', 'ag_add_adminmenu_json' );	
 		register_setting( 'agca-options-group', 'ag_colorizer_json' );	
 		register_setting( 'agca-options-group', 'agca_colorizer_turnonoff' );   
 		register_setting( 'agca-options-group', 'agca_include_jquery_migrate' );		
                 
-                register_setting( 'agca-options-group', 'agca_custom_js' );
-                register_setting( 'agca-options-group', 'agca_custom_css' );                
+        register_setting( 'agca-options-group', 'agca_custom_js' );
+        register_setting( 'agca-options-group', 'agca_custom_css' );                
              
                 
                 if(!empty($_POST)){
@@ -384,8 +385,9 @@ class AGCA{
 
 	function agca_deactivate() {	
 		
-	}          
-        function getOptions(){
+	}  
+	
+    function getOptions(){
             return Array(
                 'agca_role_allbutadmin',
 				'agca_admin_bar_frontend',
@@ -456,6 +458,7 @@ class AGCA{
                 'agca_admin_menu_submenu_round_size',
                 'agca_admin_menu_brand',
                 'agca_admin_menu_brand_link',     
+				'agca_admin_menu_always_unfolded',
 				'agca_admin_menu_collapse_button',
                 'ag_edit_adminmenu_json',
                 'ag_add_adminmenu_json',
@@ -1275,6 +1278,9 @@ try
                                                         
                                                         
 					<?php } ?>
+					<?php if(get_option('agca_admin_menu_always_unfolded')==true){ ?>                                                     
+                            jQuery(document).ready(function(){jQuery("body").removeClass("auto-fold");});                                               
+                    <?php } ?>
                                             
                                         <?php $this->print_admin_bar_scripts(); ?>
 						
@@ -2318,7 +2324,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<input title="Remove login image completely" type="checkbox" name="agca_login_photo_remove" value="true" <?php if (get_option('agca_login_photo_remove')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
-                                                        <tr valign="center">
+                            <tr valign="center">
 								<th scope="row">
 									<label title="Rounds box on login page" for="agca_login_round_box">Round box corners</label>
 								</th>
@@ -2330,7 +2336,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
                                                          $roundboxzizestyle = "style='display:none'";
                                                          if (get_option('agca_login_round_box')=='true') $roundboxzizestyle = '';
                                                          ?>
-                                                        <tr valign="center" id="agca_login_round_box_size_block" <?php echo $roundboxzizestyle; ?> >
+                            <tr valign="center" id="agca_login_round_box_size_block" <?php echo $roundboxzizestyle; ?> >
 								<th scope="row">
 									<label title="Size of rounded box curve" for="agca_login_round_box_size">Round box corners - size</label>
 								</th>
@@ -2468,7 +2474,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<input class="validateNumber" limit="3" title="Size of rounded box curve" type="text" name="agca_admin_menu_submenu_round_size"  type="text" size="3" value="<?php echo get_option('agca_admin_menu_submenu_round_size'); ?>" />&nbsp;(px)	
 								</td>
 							</tr> 
-                                                        <tr valign="center">
+                            <tr valign="center">
 								<th scope="row">
 									<label title="Adds custom logo above the admin menu" for="agca_admin_menu_brand">Add custom branding logo above the admin menu</label>
 								</th>
@@ -2477,13 +2483,21 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									&nbsp;<p><i>Put here URL of custom branding logo image. Image can be of any size and type</i>.</p>
 								</td>
 							</tr> 
-                                                        <tr valign="center">
+                            <tr valign="center">
 								<th>
 									<label title="Change branding logo link.</br></br>Use:</br><strong>%BLOG%</strong> - for blog URL" for="agca_admin_menu_brand_link">Change branding logo link.</label>
 								</th>
 								<td>
 									<input id="agca_admin_menu_brand_link" type="text" size="47" name="agca_admin_menu_brand_link" value="<?php echo get_option('agca_admin_menu_brand_link'); ?>" /><input type="button" class="agca_button" onClick="jQuery('#agca_admin_menu_brand_link').val('');" value="Clear" />
 									&nbsp;<p><i>Put here a link for branding logo</i>.</p>
+								</td>
+							</tr> 
+							<tr valign="center">
+								<th scope="row">
+									<label title="If this option is checked admin menu will stay unfolded even on short screens and mobile devices." for="agca_admin_menu_always_unfolded">Disable admin menu auto folding.</label>
+								</th>
+								<td>
+									<input title="If this option is checked admin menu will stay unfolded even on short screens and mobile devices." type="checkbox" name="agca_admin_menu_always_unfolded" value="true" <?php if (get_option('agca_admin_menu_always_unfolded')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<tr valign="center">

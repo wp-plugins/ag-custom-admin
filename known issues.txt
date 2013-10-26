@@ -1,0 +1,1 @@
+- added option for disabling admin menu auto folding.
