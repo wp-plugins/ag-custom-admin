@@ -22,7 +22,7 @@ Author URI: http://www.argonius.com/
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+	
 $agca = new AGCA();
 
 class AGCA{
@@ -243,11 +243,7 @@ class AGCA{
 	}
 	
 	function agca_enqueue_scripts() {			
-		wp_enqueue_script('jquery');		
-		if(get_option('agca_include_jquery_migrate') == 'true'){
-			wp_register_script('agca-jquery-migrate',trailingslashit(plugins_url(basename(dirname(__FILE__))))."script/jquery-migrate.js?ver=".$this->agca_version, array(), '1.2.1', true);
-			wp_enqueue_script( 'agca-jquery-migrate' );
-		}
+		wp_enqueue_script('jquery');	
 	}
 	
 	function reloadScript(){
@@ -339,13 +335,12 @@ class AGCA{
         register_setting( 'agca-options-group', 'agca_admin_menu_submenu_round' );	
         register_setting( 'agca-options-group', 'agca_admin_menu_submenu_round_size' );
         register_setting( 'agca-options-group', 'agca_admin_menu_brand' );
-        register_setting( 'agca-options-group', 'agca_admin_menu_brand_link' ); 
-		register_setting( 'agca-options-group', 'agca_admin_menu_always_unfolded' );		
+        register_setting( 'agca-options-group', 'agca_admin_menu_brand_link' );                
+		register_setting( 'agca-options-group', 'agca_admin_menu_autofold' );                
 		register_setting( 'agca-options-group', 'ag_edit_adminmenu_json' );
 		register_setting( 'agca-options-group', 'ag_add_adminmenu_json' );	
 		register_setting( 'agca-options-group', 'ag_colorizer_json' );	
-		register_setting( 'agca-options-group', 'agca_colorizer_turnonoff' );   
-		register_setting( 'agca-options-group', 'agca_include_jquery_migrate' );		
+		register_setting( 'agca-options-group', 'agca_colorizer_turnonoff' ); 		 		
                 
         register_setting( 'agca-options-group', 'agca_custom_js' );
         register_setting( 'agca-options-group', 'agca_custom_css' );                
@@ -373,7 +368,7 @@ class AGCA{
                             }
                     }else if(isset($_POST['_agca_export_settings']) && $_POST['_agca_export_settings']=="true"){
                             $this->exportSettings();  
-                    }					
+                    }    
                 }
 				
 				if(isset($_GET['agca_action'])){
@@ -457,8 +452,8 @@ class AGCA{
                 'agca_admin_menu_submenu_round',
                 'agca_admin_menu_submenu_round_size',
                 'agca_admin_menu_brand',
-                'agca_admin_menu_brand_link',     
-				'agca_admin_menu_always_unfolded',
+                'agca_admin_menu_brand_link',  
+				'agca_admin_menu_autofold',
 				'agca_admin_menu_collapse_button',
                 'ag_edit_adminmenu_json',
                 'ag_add_adminmenu_json',
@@ -466,8 +461,7 @@ class AGCA{
                 'agca_colorizer_turnonof',
                 'agca_custom_js',
                 'agca_custom_css',
-                'agca_colorizer_turnonoff',
-				'agca_include_jquery_migrate',
+                'agca_colorizer_turnonoff',				
 				'agca_disablewarning',
 				'agca_selected_template',
 				'agca_templates',
@@ -1084,7 +1078,7 @@ class AGCA{
 				$capabilitySelector .="<option val=\"$k\" $selected >".$k."</option>\n";
 		}
 		
-		$this->admin_capabilities  = "<select id=\"agca_admin_capability\"  name=\"agca_admin_capability\" val=\"upload_files\">".$capabilitySelector."</select>";
+		$this->admin_capabilities  = "<select class=\"agca-selectbox\" id=\"agca_admin_capability\"  name=\"agca_admin_capability\" val=\"upload_files\">".$capabilitySelector."</select>";
 	}
 	
 	function admin_capability(){
@@ -1278,9 +1272,11 @@ try
                                                         
                                                         
 					<?php } ?>
-					<?php if(get_option('agca_admin_menu_always_unfolded')==true){ ?>                                                     
-                            jQuery(document).ready(function(){jQuery("body").removeClass("auto-fold");});                                               
-                    <?php } ?>
+					<?php if(get_option('agca_admin_menu_autofold')=="force"){ ?>                                                     
+                                jQuery("body").addClass("auto-fold");                                               
+                    <?php } else if(get_option('agca_admin_menu_autofold')=="disable"){ ?>
+								jQuery("body").removeClass("auto-fold");                                               
+					<?php } ?>
                                             
                                         <?php $this->print_admin_bar_scripts(); ?>
 						
@@ -1336,11 +1332,7 @@ try
 					
 					<?php if(get_option('agca_language_bar')==true){ ?>
 							jQuery("#user_info p").append('<?php include("language_bar/language_bar.php"); ?>');
-					<?php } ?>
-					<?php //DEPRECATED 1.2
-					/*if(get_option('agca_menu_dashboard')==true){ 
-							jQuery("#adminmenu #menu-dashboard").css("display","none");
-					 } */?>
+					<?php } ?>					
 					<?php if(get_option('agca_dashboard_icon')==true){ ?>
 							var className = jQuery("#icon-index").attr("class");
 							if(className=='icon32'){
@@ -1674,7 +1666,9 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 						jQuery("#login h1 a").attr("title","");	
 						
 				    <?php if(get_option('agca_login_register_remove')==true){ ?>
-							jQuery('p#nav').html(jQuery('p#nav').html().replace('|',''));							
+							if(jQuery('p#nav').size() > 0){
+								jQuery('p#nav').html(jQuery('p#nav').html().replace('|',''));							
+							}							
 							jQuery('p#nav a').each(function(){
 								if(jQuery(this).attr('href').indexOf('register') != -1){
 									jQuery(this).remove();
@@ -1692,7 +1686,9 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 					<?php } ?>	
 					
 					<?php if(get_option('agca_login_lostpassword_remove')==true){ ?>
-							jQuery('p#nav').html(jQuery('p#nav').html().replace('|',''));						
+							if(jQuery('p#nav').size() > 0){
+								jQuery('p#nav').html(jQuery('p#nav').html().replace('|',''));						
+							}							
 							jQuery('p#nav a').each(function(){
 								if(jQuery(this).attr('href').indexOf('lostpassword') != -1){
 									jQuery(this).remove();
@@ -1783,7 +1779,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 								<th scope="row">
                                                                     <label title="If checked, all users will be affected with these changes, except admin. Not checked = apply for all</br></br><strong>Q</strong>: Who is administrator?</br><strong>A</strong>: Go to <i>Advanced</i> tab and change capability option to define admin users." for="agca_role_allbutadmin">Do not apply customizations for Administrator&nbsp;&nbsp;</label>
 								</th>
-								<td><input title="If checked, all users will be affected with these changes, except admin. Not checked = apply for all" type="checkbox" name="agca_role_allbutadmin" value="true" <?php if (get_option('agca_role_allbutadmin')==true) echo 'checked="checked" '; echo get_option('agca_role_allbutadmin'); ?> />								
+								<td><input class="agca-checkbox" title="If checked, all users will be affected with these changes, except admin. Not checked = apply for all" type="checkbox" name="agca_role_allbutadmin" value="true" <?php if (get_option('agca_role_allbutadmin')==true) echo 'checked="checked" '; echo get_option('agca_role_allbutadmin'); ?> />								
 								</td>
 				</tr>                                
 			</table>                        
@@ -1813,15 +1809,15 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 				<div id="section_admin_bar" class="ag_section">
 				<h2 class="section_title" tabindex="-1">Admin Bar Settings Page</h2>
 				<br />
-					<p tabindex="0"><i><strong>Info: </strong>Roll over option labels for more information about option.</i></p>							
+					<p tabindex="0"><i><strong>Info: </strong>Move your mouse over option labels for more information about an option</i></p>							
 				<br />
 				<table class="form-table" width="500px">							
 							<tr valign="center" class="ag_table_major_options" >
 								<td>
-									<label tabindex="0" title="Hide admin bar with all elements in top of admin page" for="agca_header"><strong>Hide admin bar completely</strong></label>
+									<label tabindex="0" title="Hide admin bar with all elements on the top of the admin page" for="agca_header"><strong>Hide admin bar completely</strong></label>
 								</td>
 								<td>					
-                                                                    <input id="agca_header" type="checkbox" onchange="if(jQuery('#agca_header').is(':checked')){jQuery('#agca_header_show_logout_content').show('slide');}else{jQuery('#agca_header_show_logout_content').hide('slide');};" title="Hide admin bar with all elements in top of admin page" name="agca_header" value="true" <?php if (get_option('agca_header')==true) echo 'checked="checked" '; ?> />
+                                                                    <input id="agca_header" class="agca-checkbox" type="checkbox" onchange="if(jQuery('#agca_header').is(':checked')){jQuery('#agca_header_show_logout_content').show('slide');}else{jQuery('#agca_header_show_logout_content').hide('slide');};" title="Hide admin bar with all elements on the top of the admin page" name="agca_header" value="true" <?php if (get_option('agca_header')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
                                                         
@@ -1836,7 +1832,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label tabindex="0" title='Check this if you want to show Log Out button in top right corner of admin page' for="agca_header_show_logout"><strong>(but show Log Out button)</strong></label>
 								</td>
 								<td>					
-									<input type="checkbox" title='Check this if you want to show Log Out button in top right corner of admin page' name="agca_header_show_logout" value="true" <?php if ((get_option('agca_header')==true) && (get_option('agca_header_show_logout')==true)) echo 'checked="checked" '; ?> />
+									<input type="checkbox" class="agca-checkbox" title='Check this if you want to show Log Out button in top right corner of admin page' name="agca_header_show_logout" value="true" <?php if ((get_option('agca_header')==true) && (get_option('agca_header_show_logout')==true)) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
                                                         <tr valign="center" >
@@ -1844,7 +1840,8 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label tabindex="0" title="Removes admin bar customizations (AGCA scripts) on front end." for="agca_admin_bar_frontend">Remove admin bar customizations on site pages</label>
 								</td>
 								<td>					
-                                                                    <input style="margin-left:-5px" id="agca_admin_bar_frontend" type="checkbox" title="Removes admin bar customizations (AGCA scripts) on front end." name="agca_admin_bar_frontend" value="true" <?php if (get_option('agca_admin_bar_frontend')==true) echo 'checked="checked" '; ?> />
+                                                                    <input style="margin-left:-5px" class="agca-checkbox" id="agca_admin_bar_frontend" type="checkbox" title="Removes admin bar customizations (AGCA scripts) on front end." name="agca_admin_bar_frontend" value="true" <?php if (get_option('agca_admin_bar_frontend')==true) echo 'checked="checked" '; ?> />
+																	
 								</td>
 							</tr>
 							<tr valign="center" >
@@ -1852,12 +1849,12 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label tabindex="0" title="Removes admin bar on front end." for="agca_admin_bar_frontend_hide">Remove admin bar on site pages</label>
 								</td>
 								<td>					
-                                                                    <input style="margin-left:-5px" id="agca_admin_bar_frontend_hide" type="checkbox" title="Removes admin bar on front end." name="agca_admin_bar_frontend_hide" value="true" <?php if (get_option('agca_admin_bar_frontend_hide')==true) echo 'checked="checked" '; ?> />
+                                                                    <input style="margin-left:-5px" class="agca-checkbox" id="agca_admin_bar_frontend_hide" type="checkbox" title="Removes admin bar on front end." name="agca_admin_bar_frontend_hide" value="true" <?php if (get_option('agca_admin_bar_frontend_hide')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
 							<tr valign="center">								
 								<td colspan="2">
-									<div class="ag_table_heading"><h3 tabindex="0">Elements on Left</h3></div>
+									<div class="ag_table_heading"><h3 tabindex="0">On the Left</h3></div>
 								</td>
 								<td></td>
 							</tr>
@@ -1867,7 +1864,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="This is link next to heading in admin bar" for="agca_privacy_options">Hide Privacy link</label>
 								</th>
 								<td>					
-									<input type="checkbox" title="This is link next to heading in admin bar" name="agca_privacy_options" value="true" <?php if (get_option('agca_privacy_options')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" title="This is link next to heading in admin bar" name="agca_privacy_options" value="true" <?php if (get_option('agca_privacy_options')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
 							<?php } ?>							
@@ -1900,10 +1897,10 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 							</tr> 
 							<tr valign="center">
 								<th >
-									<label title="Add custom image on the top of admin content." for="agca_header_logo_custom">Custom header image</label>
+									<label title="Add custom image on the top of the admin content." for="agca_header_logo_custom">Custom header image</label>
 								</th>
 								<td>
-									<input title="If this field is not empty, image from provided url will be visible in header" type="text" size="47" id="agca_header_logo_custom" name="agca_header_logo_custom" value="<?php echo get_option('agca_header_logo_custom'); ?>" /><input type="button" class="agca_button"  onClick="jQuery('#agca_header_logo_custom').val('');" value="Clear" />																
+									<input title="If this field is not empty, image from provided URL will be visible in header" type="text" size="47" id="agca_header_logo_custom" name="agca_header_logo_custom" value="<?php echo get_option('agca_header_logo_custom'); ?>" /><input type="button" class="agca_button"  onClick="jQuery('#agca_header_logo_custom').val('');" value="Clear" />																
 									&nbsp;<p><i>Add custom header image</i>.</p>
 								</td>
 							</tr> 
@@ -1912,7 +1909,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Small Wordpress logo in admin top bar" for="agca_header_logo">Hide WordPress logo</label>
 								</th>
 								<td>					
-									<input title="Small Wordpress logo in admin top bar" type="checkbox" name="agca_header_logo" value="true" <?php if (get_option('agca_header_logo')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Small Wordpress logo in admin top bar" type="checkbox" name="agca_header_logo" value="true" <?php if (get_option('agca_header_logo')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<?php if($wpversion>=3.3){?>
@@ -1921,7 +1918,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Hides site name section in admin bar" for="agca_remove_site_link">Hide site name in admin bar</label>
 								</th>
 								<td>					
-									<input title="Hides site name section in admin bar" type="checkbox" name="agca_remove_site_link" value="true" <?php if (get_option('agca_remove_site_link')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Hides site name section in admin bar" type="checkbox" name="agca_remove_site_link" value="true" <?php if (get_option('agca_remove_site_link')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 							
 							<tr valign="center">
@@ -1929,7 +1926,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Hides default WordPress top bar dropdown menus on WordPress logo and Heading" for="agca_remove_top_bar_dropdowns">Hide WordPress top bar dropdown menus</label>
 								</th>
 								<td>					
-									<input title="Hides default WordPress top bar dropdown menus on WordPress logo and Heading" type="checkbox" name="agca_remove_top_bar_dropdowns" value="true" <?php if (get_option('agca_remove_top_bar_dropdowns')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Hides default WordPress top bar dropdown menus on WordPress logo and Heading" type="checkbox" name="agca_remove_top_bar_dropdowns" value="true" <?php if (get_option('agca_remove_top_bar_dropdowns')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<tr valign="center">
@@ -1937,15 +1934,15 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Removes comments block from admin bar" for="agca_admin_bar_comments">Hide admin bar "Comments"</label>
 								</th>
 								<td>					
-									<input title="Removes comments block from admin bar" type="checkbox" name="agca_admin_bar_comments" value="true" <?php if (get_option('agca_admin_bar_comments')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Removes comments block from admin bar" type="checkbox" name="agca_admin_bar_comments" value="true" <?php if (get_option('agca_admin_bar_comments')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<tr valign="center" style="margin-top:20px;">
 								<th >
-									<label title="Removes 'New' block with its contents from admin bar" for="agca_admin_bar_new_content">Hide admin bar "New" content</label>
+									<label title="Removes 'New' block with its contents from admin bar" for="agca_admin_bar_new_content">Hide admin bar "New" content completely</label>
 								</th>
 								<td>					
-									<input title="Removes 'New' block with its contents from admin bar" type="checkbox" name="agca_admin_bar_new_content" value="true" <?php if (get_option('agca_admin_bar_new_content')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Removes 'New' block with its contents from admin bar" type="checkbox" name="agca_admin_bar_new_content" value="true" <?php if (get_option('agca_admin_bar_new_content')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 	
 							<tr class="new_content_header_submenu" valign="center">
@@ -1953,7 +1950,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Removes 'Post' submenu from 'New' option from admin bar" for="agca_admin_bar_new_content_post">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hide "New" content -> Post submenu</label>
 								</th>
 								<td>					
-									<input title="Removes 'Post' submenu from 'New' option from admin bar" type="checkbox" name="agca_admin_bar_new_content_post" value="true" <?php if (get_option('agca_admin_bar_new_content_post')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Removes 'Post' submenu from 'New' option from admin bar" type="checkbox" name="agca_admin_bar_new_content_post" value="true" <?php if (get_option('agca_admin_bar_new_content_post')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<tr  class="new_content_header_submenu" valign="center">
@@ -1961,7 +1958,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Removes 'Link' submenu from 'New' option from admin bar" for="agca_admin_bar_new_content_link">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hide "New" content -> Link submenu</label>
 								</th>
 								<td>					
-									<input title="Removes 'Link' submenu from 'New' option from admin bar" type="checkbox" name="agca_admin_bar_new_content_link" value="true" <?php if (get_option('agca_admin_bar_new_content_link')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Removes 'Link' submenu from 'New' option from admin bar" type="checkbox" name="agca_admin_bar_new_content_link" value="true" <?php if (get_option('agca_admin_bar_new_content_link')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<tr class="new_content_header_submenu" valign="center">
@@ -1969,7 +1966,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Removes 'Page' submenu from 'New' option from admin bar" for="agca_admin_bar_new_content_page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hide "New" content -> Page submenu</label>
 								</th>
 								<td>					
-									<input title="Removes 'Page' submenu from 'New' option from admin bar" type="checkbox" name="agca_admin_bar_new_content_page" value="true" <?php if (get_option('agca_admin_bar_new_content_page')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Removes 'Page' submenu from 'New' option from admin bar" type="checkbox" name="agca_admin_bar_new_content_page" value="true" <?php if (get_option('agca_admin_bar_new_content_page')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<tr class="new_content_header_submenu" valign="center">
@@ -1977,7 +1974,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Removes 'User' submenu from 'New' option from admin bar" for="agca_admin_bar_new_content_user">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hide "New" content -> User submenu</label>
 								</th>
 								<td>					
-									<input title="Removes 'User' submenu from 'New' option from admin bar" type="checkbox" name="agca_admin_bar_new_content_user" value="true" <?php if (get_option('agca_admin_bar_new_content_user')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Removes 'User' submenu from 'New' option from admin bar" type="checkbox" name="agca_admin_bar_new_content_user" value="true" <?php if (get_option('agca_admin_bar_new_content_user')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<tr class="new_content_header_submenu" valign="center">
@@ -1985,7 +1982,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Removes 'Media' submenu from 'New' option from admin bar" for="agca_admin_bar_new_content_media">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hide "New" content -> Media submenu</label>
 								</th>
 								<td>					
-									<input title="Removes 'Media' submenu from 'New' option from admin bar" type="checkbox" name="agca_admin_bar_new_content_media" value="true" <?php if (get_option('agca_admin_bar_new_content_media')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Removes 'Media' submenu from 'New' option from admin bar" type="checkbox" name="agca_admin_bar_new_content_media" value="true" <?php if (get_option('agca_admin_bar_new_content_media')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
 							<tr valign="center">
@@ -1993,7 +1990,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Removes update notifications from admin bar" for="agca_admin_bar_update_notifications">Hide admin bar update notifications</label>
 								</th>
 								<td>					
-									<input title="Removes update notifications from admin bar" type="checkbox" name="agca_admin_bar_update_notifications" value="true" <?php if (get_option('agca_admin_bar_update_notifications')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Removes update notifications from admin bar" type="checkbox" name="agca_admin_bar_update_notifications" value="true" <?php if (get_option('agca_admin_bar_update_notifications')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 							
 							<?php } ?>
@@ -2008,10 +2005,10 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 							</tr> 
 							<tr valign="center">
 								<th scope="row">
-									<label title="Hides yellow bar with notifications of new Wordpress release" for="agca_update_bar">Hide WordPress update notification bar</label>
+									<label title="Hides yellow bar with notifications for new Wordpress release" for="agca_update_bar">Hide WordPress update notification bar</label>
 								</th>
 								<td>					
-									<input title="Hides yellow bar with notifications of new Wordpress release" type="checkbox" name="agca_update_bar" value="true" <?php if (get_option('agca_update_bar')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Hides yellow bar with notifications for new Wordpress release" type="checkbox" name="agca_update_bar" value="true" <?php if (get_option('agca_update_bar')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							
@@ -2021,14 +2018,14 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_site_heading">Hide default blog heading</label>
 								</th>
 								<td>					
-									<input type="checkbox" name="agca_site_heading" value="true" <?php if (get_option('agca_site_heading')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_site_heading" value="true" <?php if (get_option('agca_site_heading')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
 							<?php } ?>
 							
 							<tr valign="center">
 								<td colspan="2">
-										<div class="ag_table_heading"><h3 tabindex="0">Elements on Right</h3></div>
+										<div class="ag_table_heading"><h3 tabindex="0">On the Right</h3></div>
 								</td>
 								<td>									
 								</td>
@@ -2038,7 +2035,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_screen_options_menu-options">Hide Screen Options menu</label>
 								</th>
 								<td>						
-									<input type="checkbox" name="agca_screen_options_menu" value="true" <?php if (get_option('agca_screen_options_menu')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_screen_options_menu" value="true" <?php if (get_option('agca_screen_options_menu')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
 							<tr valign="center">
@@ -2046,7 +2043,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_help_menu">Hide Help menu</label>
 								</th>
 								<td>						
-									<input type="checkbox" name="agca_help_menu" value="true" <?php if (get_option('agca_help_menu')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_help_menu" value="true" <?php if (get_option('agca_help_menu')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
 							<tr valign="center">
@@ -2054,7 +2051,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_options_menu">Hide Favorite Actions</label>
 								</th>
 								<td>					
-									<input type="checkbox" name="agca_options_menu" value="true" <?php if (get_option('agca_options_menu')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_options_menu" value="true" <?php if (get_option('agca_options_menu')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 	
 							<tr valign="center">
@@ -2081,7 +2078,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_remove_your_profile"><?php echo $profile_text; ?></label>
 								</th>
 								<td>					
-									<input type="checkbox" name="agca_remove_your_profile" value="true" <?php if (get_option('agca_remove_your_profile')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_remove_your_profile" value="true" <?php if (get_option('agca_remove_your_profile')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<?php } ?>
@@ -2090,7 +2087,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="If selected, hides all elements in top right corner, except Log Out button" for="agca_logout_only">Log out only</label>
 								</th>
 								<td>
-									<input title="If selected, hides all elements in top right corner, except Log Out button" type="checkbox" name="agca_logout_only" value="true" <?php if (get_option('agca_logout_only')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="If selected, hides all elements in top right corner, except Log Out button" type="checkbox" name="agca_logout_only" value="true" <?php if (get_option('agca_logout_only')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>							
 							</table>
@@ -2105,7 +2102,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Hides footer with all elements" for="agca_footer"><strong>Hide footer completely</strong></label>
 								</td>
 								<td>					
-									<input title="Hides footer with all elements" type="checkbox" id="agca_footer" name="agca_footer" value="true" <?php if (get_option('agca_footer')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Hides footer with all elements" type="checkbox" id="agca_footer" name="agca_footer" value="true" <?php if (get_option('agca_footer')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<tr valign="center">
@@ -2119,7 +2116,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 								<th scope="row">
 									<label title="Hides default text in footer" for="agca_footer_left_hide">Hide footer text</label>
 								</th>
-								<td><input title="Hides default text in footer" type="checkbox" name="agca_footer_left_hide" value="true" <?php if (get_option('agca_footer_left_hide')==true) echo 'checked="checked" '; ?> />								
+								<td><input class="agca-checkbox" title="Hides default text in footer" type="checkbox" name="agca_footer_left_hide" value="true" <?php if (get_option('agca_footer_left_hide')==true) echo 'checked="checked" '; ?> />								
 								</td>
 							</tr> 
 							<tr valign="center">
@@ -2134,7 +2131,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 								<th scope="row">
 									<label title="Hides text 'Get Version ...' on right" for="agca_footer_right_hide">Hide version text</label>
 								</th>
-								<td><input title="Hides text 'Get Version ...' on right" type="checkbox" name="agca_footer_right_hide" value="true" <?php if (get_option('agca_footer_right_hide')==true) echo 'checked="checked" '; ?> />								
+								<td><input class="agca-checkbox" title="Hides text 'Get Version ...' on right" type="checkbox" name="agca_footer_right_hide" value="true" <?php if (get_option('agca_footer_right_hide')==true) echo 'checked="checked" '; ?> />								
 								</td>
 							</tr> 
 							<tr valign="center">
@@ -2162,7 +2159,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="This is small 'house' icon next to main heading (Dashboard text by default) on Dashboard page" for="agca_dashboard_icon">Hide Dashboard heading icon</label>
 								</th>
 								<td>					
-									<input title="This is small house icon next to main heading on Dashboard page. Dashboard text is shown by default" type="checkbox" name="agca_dashboard_icon" value="true" <?php if (get_option('agca_dashboard_icon')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="This is small house icon next to main heading on Dashboard page. Dashboard text is shown by default" type="checkbox" name="agca_dashboard_icon" value="true" <?php if (get_option('agca_dashboard_icon')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
 							
@@ -2177,18 +2174,9 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Adds custom text (or HTML) between heading and widgets area on Dashboard page" for="agca_dashboard_text_paragraph">Add custom Dashboard content<br> <em>(text or HTML content)</em></label>
 								</th>
 								<td class="agca_editor">								
-								<?php $this->getTextEditor('agca_dashboard_text_paragraph'); ?>		
+								<?php $this->getTextEditor('agca_dashboard_text_paragraph'); ?>			
 								</td>
-							</tr>
-							<?php /* DEPRECATED 1.2
-							<tr valign="center">
-								<th scope="row">
-									<label for="agca_menu_dashboard">Hide Dashboard button from main menu</label>
-								</th>
-								<td>					
-									<input type="checkbox" name="agca_menu_dashboard" value="true" <php if (get_option('agca_menu_dashboard')==true) echo 'checked="checked" '; > />
-								</td>
-							</tr> */ ?>
+							</tr>							
 							<tr valign="center">
 								<td colspan="2">
 										<div class="ag_table_heading"><h3 tabindex="0">Dashboard widgets Options</h3></div>
@@ -2204,7 +2192,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_dashboard_widget_welcome">Hide "Welcome" WordPress Message</label>
 								</th>
 								<td>					
-									<input type="checkbox" name="agca_dashboard_widget_welcome" value="true" <?php if (get_option('agca_dashboard_widget_welcome')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_dashboard_widget_welcome" value="true" <?php if (get_option('agca_dashboard_widget_welcome')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>	
 							<tr valign="center">
@@ -2212,7 +2200,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_dashboard_widget_rc">Hide "Recent Comments"</label>
 								</th>
 								<td>					
-									<input type="checkbox" name="agca_dashboard_widget_rc" value="true" <?php if (get_option('agca_dashboard_widget_rc')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_dashboard_widget_rc" value="true" <?php if (get_option('agca_dashboard_widget_rc')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>	
 							<tr valign="center">
@@ -2220,7 +2208,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_dashboard_widget_il">Hide "Incoming Links"</label>
 								</th>
 								<td>					
-									<input type="checkbox" name="agca_dashboard_widget_il" value="true" <?php if (get_option('agca_dashboard_widget_il')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_dashboard_widget_il" value="true" <?php if (get_option('agca_dashboard_widget_il')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
 								<tr valign="center">
@@ -2228,7 +2216,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_dashboard_widget_plugins">Hide "Plugins"</label>
 								</th>
 								<td>					
-									<input type="checkbox" name="agca_dashboard_widget_plugins" value="true" <?php if (get_option('agca_dashboard_widget_plugins')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_dashboard_widget_plugins" value="true" <?php if (get_option('agca_dashboard_widget_plugins')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>											
 							<tr valign="center">
@@ -2236,7 +2224,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_dashboard_widget_qp">Hide "Quick Press"</label>
 								</th>
 								<td>					
-									<input type="checkbox" name="agca_dashboard_widget_qp" value="true" <?php if (get_option('agca_dashboard_widget_qp')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_dashboard_widget_qp" value="true" <?php if (get_option('agca_dashboard_widget_qp')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>	
 							<tr valign="center">
@@ -2244,7 +2232,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_dashboard_widget_rn">Hide "Right Now"</label>
 								</th>
 								<td>					
-									<input type="checkbox" name="agca_dashboard_widget_rn" value="true" <?php if (get_option('agca_dashboard_widget_rn')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_dashboard_widget_rn" value="true" <?php if (get_option('agca_dashboard_widget_rn')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>	
 							<tr valign="center">
@@ -2252,7 +2240,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label for="agca_dashboard_widget_rd">Hide "Recent Drafts"</label>
 								</th>
 								<td>					
-									<input type="checkbox" name="agca_dashboard_widget_rd" value="true" <?php if (get_option('agca_dashboard_widget_rd')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" type="checkbox" name="agca_dashboard_widget_rd" value="true" <?php if (get_option('agca_dashboard_widget_rd')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>	
 							<tr valign="center">
@@ -2260,7 +2248,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="This is 'WordPress Development Blog' widget by default" for="agca_dashboard_widget_primary">Hide primary widget area</label>
 								</th>
 								<td>					
-									<input title="This is 'WordPress Development Blog' widget by default" type="checkbox" name="agca_dashboard_widget_primary" value="true" <?php if (get_option('agca_dashboard_widget_primary')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="This is 'WordPress Development Blog' widget by default" type="checkbox" name="agca_dashboard_widget_primary" value="true" <?php if (get_option('agca_dashboard_widget_primary')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>	
 							<tr valign="center">
@@ -2268,7 +2256,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="This is 'Other WordPress News' widget by default"  for="agca_dashboard_widget_secondary">Hide secondary widget area</label>
 								</th>
 								<td>					
-									<input title="This is 'Other WordPress News' widget by default" type="checkbox" name="agca_dashboard_widget_secondary" value="true" <?php if (get_option('agca_dashboard_widget_secondary')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="This is 'Other WordPress News' widget by default" type="checkbox" name="agca_dashboard_widget_secondary" value="true" <?php if (get_option('agca_dashboard_widget_secondary')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>	
 							</table>
@@ -2287,7 +2275,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 										<label for="agca_login_banner">Hide back to blog text</label>
 									</td>
 									<td>					
-										<input type="checkbox" name="agca_login_banner" title="Hide back to blog block" value="true" <?php if (get_option('agca_login_banner')==true) echo 'checked="checked" '; ?> />
+										<input class="agca-checkbox" type="checkbox" name="agca_login_banner" title="Hide back to blog block" value="true" <?php if (get_option('agca_login_banner')==true) echo 'checked="checked" '; ?> />
 									</td>
 							</tr>
 							<tr valign="center">
@@ -2321,7 +2309,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Remove login image completely" for="agca_login_photo_remove">Hide Login header image</label>
 								</th>
 								<td>
-									<input title="Remove login image completely" type="checkbox" name="agca_login_photo_remove" value="true" <?php if (get_option('agca_login_photo_remove')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Remove login image completely" type="checkbox" name="agca_login_photo_remove" value="true" <?php if (get_option('agca_login_photo_remove')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
                             <tr valign="center">
@@ -2329,7 +2317,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Rounds box on login page" for="agca_login_round_box">Round box corners</label>
 								</th>
 								<td>
-									<input title="Rounds box on login page" type="checkbox" name="agca_login_round_box" value="true" <?php if (get_option('agca_login_round_box')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Rounds box on login page" type="checkbox" name="agca_login_round_box" value="true" <?php if (get_option('agca_login_round_box')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
                                                          <?php 
@@ -2349,7 +2337,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Remove register link on login page" for="agca_login_register_remove">Remove register link</label>
 								</th>
 								<td>
-									<input title="Remove register link on login page" type="checkbox" name="agca_login_register_remove" value="true" <?php if (get_option('agca_login_register_remove')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Remove register link on login page" type="checkbox" name="agca_login_register_remove" value="true" <?php if (get_option('agca_login_register_remove')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
 														<?php 
@@ -2369,7 +2357,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Removes lost password link on login page" for="agca_login_lostpassword_remove">Remove lost password link</label>
 								</th>
 								<td>
-									<input title="Removes lost password link on login page" type="checkbox" name="agca_login_lostpassword_remove" value="true" <?php if (get_option('agca_login_lostpassword_remove')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" class="agca-checkbox" title="Removes lost password link on login page" type="checkbox" name="agca_login_lostpassword_remove" value="true" <?php if (get_option('agca_login_lostpassword_remove')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr>
 						</table>
@@ -2386,15 +2374,15 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 							<table class="form-table" width="500px">	
 							<tr valign="center" class="ag_table_major_options">
 								<td><label for="agca_admin_menu_turnonoff"><strong>Turn on/off admin menu configuration</strong></label></td>
-								<td><strong><input type="radio" name="agca_admin_menu_turnonoff" title="Turn ON admin menu configuration" value="on" <?php if(get_option('agca_admin_menu_turnonoff') == 'on') echo 'checked="checked" '; ?> /><span style="color:green">ON</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="agca_admin_menu_turnonoff" title="Turn OFF admin menu configuration" value="off" <?php if(get_option('agca_admin_menu_turnonoff') != 'on') echo 'checked="checked"'; ?> /><span style="color:red">OFF</span></strong></td>
+								<td><strong><input class="agca-radio" type="radio" name="agca_admin_menu_turnonoff" title="Turn ON admin menu configuration" value="on" <?php if(get_option('agca_admin_menu_turnonoff') == 'on') echo 'checked="checked" '; ?> /><span class="agca-radio-text" style="color:green">ON</span>&nbsp;&nbsp;&nbsp;&nbsp;<input class="agca-radio" type="radio" name="agca_admin_menu_turnonoff" title="Turn OFF admin menu configuration" value="off" <?php if(get_option('agca_admin_menu_turnonoff') != 'on') echo 'checked="checked"'; ?> /><span class="agca-radio-text" style="color:red">OFF</span></strong></td>
 							</tr>
 							<tr valign="center" class="ag_table_major_options">
-								<td><label for="agca_admin_menu_agca_button_only"><strong>Hide admin menu completly (administrator can see AG custom admin button)</strong></label></td>
-								<td><input type="checkbox" name="agca_admin_menu_agca_button_only" title="Hide admin menu completly (administrator can see 'AG custom admin' button)" value="true" <?php if (get_option('agca_admin_menu_agca_button_only')==true) echo 'checked="checked" '; ?> /></td>
+								<td><label for="agca_admin_menu_agca_button_only"><strong>Hide admin menu completly</br>(administrator can see AG custom admin button)</strong></label></td>
+								<td><input class="agca-checkbox" type="checkbox" name="agca_admin_menu_agca_button_only" title="Hide admin menu completly (administrator can see 'AG custom admin' button)" value="true" <?php if (get_option('agca_admin_menu_agca_button_only')==true) echo 'checked="checked" '; ?> /></td>
 							</tr>
 							<tr valign="center">
 								<td colspan="2">
-										<div class="ag_table_heading"><h3 tabindex="0">Edit/Remove Menu Items</h3></div>
+										<div class="ag_table_heading"><h3 tabindex="0">Edit / Remove Menu Items</h3></div>
 								</td>
 								<td>									
 								</td>
@@ -2403,7 +2391,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 								<td colspan="2">
 								Reset to default values
 											<input type="button" class="agca_button"  id="ag_edit_adminmenu_reset_button" title="Reset menu settings to default values" name="ag_edit_adminmenu_reset_button" value="Reset Settings" /><br />
-											<p tabindex="0"><em>(click on menu link to show/hide its submenus below it)</em></p>
+											<p tabindex="0"><em>(click on the top menu items to show / hide their sub-menus)</em></p>
 									<table id="ag_edit_adminmenu">									
 										<tr style="background-color:#999;">
 											<td width="300px"><div style="float:left;color:#fff;"><h3>Item</h3></div><div style="float:right;color:#fff;"><h3>Remove?</h3></div></td><td width="300px" style="color:#fff;" ><h3>Change Text</h3>													
@@ -2416,18 +2404,18 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 							</tr>
 							<tr valign="center">
 								<th scope="row">
-									<label title="This is blank space between Dashboard and Posts button (by default)" for="agca_admin_menu_separator_first">Remove first items separator</label>
+									<label title="This is blank space between Dashboard and Posts button (by default)" for="agca_admin_menu_separator_first">Remove first menu items separator</label>
 								</th>
 								<td>
-									<input title="This is blank space separator between Dashboard and Posts button (by default)" type="checkbox" name="agca_admin_menu_separator_first" value="true" <?php if (get_option('agca_admin_menu_separator_first')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="This is blank space separator between Dashboard and Posts button (by default)" type="checkbox" name="agca_admin_menu_separator_first" value="true" <?php if (get_option('agca_admin_menu_separator_first')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<tr valign="center">
 								<th scope="row">
-									<label title="This is blank space  separator between Comments and Appearance button (by default)" for="agca_admin_menu_separator_second">Remove second items separator</label>
+									<label title="This is blank space  separator between Comments and Appearance button (by default)" for="agca_admin_menu_separator_second">Remove second menu items separator</label>
 								</th>
 								<td>
-									<input title="This is blank space  separator between Comments and Appearance button (by default)" type="checkbox" name="agca_admin_menu_separator_second" value="true" <?php if (get_option('agca_admin_menu_separator_second')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="This is blank space  separator between Comments and Appearance button (by default)" type="checkbox" name="agca_admin_menu_separator_second" value="true" <?php if (get_option('agca_admin_menu_separator_second')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<tr valign="center">
@@ -2435,15 +2423,15 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Removes small icons on admin menu buttons" for="agca_admin_menu_icons">Remove menu icons</label>
 								</th>
 								<td>
-									<input title="Removes small icons on admin menu buttons" type="checkbox" name="agca_admin_menu_icons" value="true" <?php if (get_option('agca_admin_menu_icons')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Removes small icons on admin menu buttons" type="checkbox" name="agca_admin_menu_icons" value="true" <?php if (get_option('agca_admin_menu_icons')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
                                                         <tr valign="center">
 								<th scope="row">
-									<label title="Removes small arrow that appears on button hover" for="agca_admin_menu_arrow">Remove submenu arrow</label>
+									<label title="Removes small arrow that appears on button hover" for="agca_admin_menu_arrow">Remove sub-menu arrow</label>
 								</th>
 								<td>
-									<input title="Removes small arrow that appears on button hover" type="checkbox" name="agca_admin_menu_arrow" value="true" <?php if (get_option('agca_admin_menu_arrow')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Removes small arrow that appears on button hover" type="checkbox" name="agca_admin_menu_arrow" value="true" <?php if (get_option('agca_admin_menu_arrow')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
 							<tr valign="center">
@@ -2451,15 +2439,15 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<label title="Removes collapse button at the end of admin menu" for="agca_admin_menu_collapse_button">Remove "Collapse menu" button</label>
 								</th>
 								<td>
-									<input title="Removes collapse button at the end of admin menu" type="checkbox" name="agca_admin_menu_collapse_button" value="true" <?php if (get_option('agca_admin_menu_collapse_button')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Removes collapse button at the end of admin menu" type="checkbox" name="agca_admin_menu_collapse_button" value="true" <?php if (get_option('agca_admin_menu_collapse_button')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
                                                         <tr valign="center">
 								<th scope="row">
-									<label title="Rounds submenu pop-up box" for="agca_admin_menu_submenu_round">Round submenu pop-up box</label><p><i>(Use it in combination with Colorizer)</i></p>
+									<label title="Rounds submenu pop-up box" for="agca_admin_menu_submenu_round">Round sub-menu pop-up box</label><p><i>(Please use it in combination with Colorizer)</i></p>
 								</th>
 								<td>
-									<input title="Rounds submenu pop-up box" type="checkbox" name="agca_admin_menu_submenu_round" value="true" <?php if (get_option('agca_admin_menu_submenu_round')==true) echo 'checked="checked" '; ?> />
+									<input class="agca-checkbox" title="Rounds submenu pop-up box" type="checkbox" name="agca_admin_menu_submenu_round" value="true" <?php if (get_option('agca_admin_menu_submenu_round')==true) echo 'checked="checked" '; ?> />
 								</td>
 							</tr> 
                                                          <?php 
@@ -2468,7 +2456,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
                                                          ?>
                                                         <tr valign="center" id="agca_admin_menu_submenu_round_block" <?php echo $roundsubmenuzizestyle; ?> >
 								<th scope="row">
-									<label title="Size of rounded box curve" for="agca_admin_menu_submenu_round_size">Round submenu pop-up box - size</label>
+									<label title="Size of rounded box curve" for="agca_admin_menu_submenu_round_size">Round sub-menu pop-up box - size</label>
 								</th>
 								<td>
 									<input class="validateNumber" limit="3" title="Size of rounded box curve" type="text" name="agca_admin_menu_submenu_round_size"  type="text" size="3" value="<?php echo get_option('agca_admin_menu_submenu_round_size'); ?>" />&nbsp;(px)	
@@ -2480,12 +2468,12 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 								</th>
 								<td>
 									<input id="agca_admin_menu_brand" title="Adds custom logo above the admin menu" type="text" size="47" name="agca_admin_menu_brand" value="<?php echo get_option('agca_admin_menu_brand'); ?>" /><input type="button" class="agca_button" onClick="jQuery('#agca_admin_menu_brand').val('');" value="Clear" />																
-									&nbsp;<p><i>Put here URL of custom branding logo image. Image can be of any size and type</i>.</p>
+									&nbsp;<p><i>Put here your custom image URL. Image can be of any size and type</i>.</p>
 								</td>
 							</tr> 
                             <tr valign="center">
 								<th>
-									<label title="Change branding logo link.</br></br>Use:</br><strong>%BLOG%</strong> - for blog URL" for="agca_admin_menu_brand_link">Change branding logo link.</label>
+									<label title="Change branding logo link</br></br>Use:</br><strong>%BLOG%</strong> - for blog URL" for="agca_admin_menu_brand_link">Change branding logo link</label>
 								</th>
 								<td>
 									<input id="agca_admin_menu_brand_link" type="text" size="47" name="agca_admin_menu_brand_link" value="<?php echo get_option('agca_admin_menu_brand_link'); ?>" /><input type="button" class="agca_button" onClick="jQuery('#agca_admin_menu_brand_link').val('');" value="Clear" />
@@ -2494,10 +2482,14 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 							</tr> 
 							<tr valign="center">
 								<th scope="row">
-									<label title="If this option is checked admin menu will stay unfolded even on short screens and mobile devices." for="agca_admin_menu_always_unfolded">Disable admin menu auto folding.</label>
+									<label title="Choose how admin menu should behave on mobile devices / small screens" for="agca_admin_menu_autofold">Admin menu auto folding</label>
 								</th>
-								<td>
-									<input title="If this option is checked admin menu will stay unfolded even on short screens and mobile devices." type="checkbox" name="agca_admin_menu_always_unfolded" value="true" <?php if (get_option('agca_admin_menu_always_unfolded')==true) echo 'checked="checked" '; ?> />
+								<td>									
+									<select title="Choose how admin menu should behave on mobile devices / small screens" class="agca-selectbox" name="agca_admin_menu_autofold" >
+										<option value="" <?php echo (get_option('agca_admin_menu_autofold') == "")?" selected ":""; ?> >Default</option>
+										<option value="force" <?php echo (get_option('agca_admin_menu_autofold') == "force")?" selected ":""; ?> >Force admin menu auto-folding</option>
+										<option value="disable" <?php echo (get_option('agca_admin_menu_autofold') == "disable")?" selected ":""; ?> >Disable admin menu auto-folding</option>
+									</select>
 								</td>
 							</tr> 
 							<tr valign="center">
@@ -2515,7 +2507,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 											<td colspan="2">
 												name:<input type="text" size="47" title="New button visible name" id="ag_add_adminmenu_name" name="ag_add_adminmenu_name" />
 												url:<input type="text" size="47" title="New button link" id="ag_add_adminmenu_url" name="ag_add_adminmenu_url" />
-												<select id="ag_add_adminmenu_target" style="width:64px">
+												<select id="ag_add_adminmenu_target" class="agca-selectbox" style="width:64px">
 													<option value="_blank" selected >blank</option>
 													<option value="_self">self</option>
 													<option value="_parent">parent</option>													
@@ -2538,7 +2530,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 						<table class="form-table" width="500px">	
 							<tr valign="center" class="ag_table_major_options">
 								<td><label for="agca_colorizer_turnonoff"><strong>Turn on/off Colorizer configuration</strong></label></td>
-								<td><strong><input type="radio" name="agca_colorizer_turnonoff" title="Turn ON Colorizer configuration" value="on" <?php if(get_option('agca_colorizer_turnonoff') == 'on') echo 'checked="checked" '; ?> /><span style="color:green">ON</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="agca_colorizer_turnonoff" title="Turn OFF Colorizer configuration" value="off" <?php if(get_option('agca_colorizer_turnonoff') != 'on') echo 'checked="checked"'; ?> /><span style="color:red">OFF</span></strong></td>
+								<td><strong><input class="agca-radio" type="radio" name="agca_colorizer_turnonoff" title="Turn ON Colorizer configuration" value="on" <?php if(get_option('agca_colorizer_turnonoff') == 'on') echo 'checked="checked" '; ?> /><span class="agca-radio-text" style="color:green">ON</span>&nbsp;&nbsp;&nbsp;&nbsp;<input class="agca-radio" type="radio" name="agca_colorizer_turnonoff" title="Turn OFF Colorizer configuration" value="off" <?php if(get_option('agca_colorizer_turnonoff') != 'on') echo 'checked="checked"'; ?> /><span class="agca-radio-text" style="color:red">OFF</span></strong></td>
 							</tr>	
 							<tr valign="center">
 								<td colspan="2">
@@ -2746,19 +2738,11 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 																						<th scope="row">
 																							<label title="Choose which capability will be used to distinct admin user from other users.</br>If customizations are not applied for admin users, this setting will be used to define admin users." for="agca_admin_capability">Distinguish admin from other users by capability:</label>
 																						</th>
-																						<td><?php echo $this->admin_capabilities; ?><i>(<strong>edit_dashboard</strong> is selected by default)</i>																							
+																						<td><?php echo $this->admin_capabilities; ?>&nbsp;&nbsp;<i>(<strong>edit_dashboard</strong> is selected by default)</i>																							
 																						</td>
 																						<td>
 																						</td>
-																					</tr> 
-																					<tr valign="center">
-																						<th scope="row">
-																							<label title="If you're using an older version of jQuery plugin which has some deprecated functions, please include this option to make plugin backward compatible with your WordPress." for="agca_include_jquery_migrate">Include jQuery migration script</label>
-																						</th>
-																						<td>					
-																							<input title="If you're using an older version of jQuery plugin which has some deprecated functions, please include this option to make plugin backward compatible with your WordPress." type="checkbox" name="agca_include_jquery_migrate" value="true" <?php if (get_option('agca_include_jquery_migrate')==true) echo 'checked="checked" '; ?> />
-																						</td>
-																					</tr>
+																					</tr> 																					
 																					<tr valign="center">
 																					<td colspan="2">
 																						<br />
@@ -2784,10 +2768,10 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
                                                                                     </tr>
                                                                                      <tr valign="center">
                                                                                             <th scope="row">
-                                                                                                    <label title="Export/import settings" for="agca_export_import">Export / import settings</label>
+                                                                                                    <label title="Export / import settings" for="agca_export_import">Export / import settings</label>
                                                                                             </th>
                                                                                             <td id="import_file_area">
-                                                                                                <div id="export_settings_additional"  style="display: none" ><input type="checkbox" id="export_settings_include_admin_menu" name="export_settings_include_admin_menu" />&nbsp;<label title="Includes 'Admin Menu' configuration in exported settings.</br>Include admin menu settings only if your admin menu looks the same on multiple sites.</br>If configurations are different, imported menu settings could be wrong. In that case, use 'Reset Settings' button from 'Admin Menu' section.</br>(Custom buttons and menu configuration will be included anyway)">Include Admin Menu(?)</label></div> 
+                                                                                                <div id="export_settings_additional"  style="display: none" ><input class="agca-checkbox" type="checkbox" id="export_settings_include_admin_menu" name="export_settings_include_admin_menu" />&nbsp;<label title="Includes 'Admin Menu' configuration in exported settings.</br>Include admin menu settings only if your admin menu looks the same on multiple sites.</br>If configurations are different, imported menu settings could be wrong. In that case, use 'Reset Settings' button from 'Admin Menu' section.</br>(Custom buttons and menu configuration will be included anyway)">Include Admin Menu(?)</label></div> 
                                                                                                 <input class="agca_button"  type="button" name="agca_export_settings" value="Export Settings" onclick="exportSettings();"/></br>
                                                                                                 <input type="file" id="settings_import_file" name="settings_import_file" style="display: none"/>       
                                                                                                     <input type="hidden" id="_agca_import_settings" name="_agca_import_settings" value="false" /> 
@@ -2803,7 +2787,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
                                                                                 </table>
                                                 </div>
 				<br /><br /><br />
-				<p class="submit">
+				<p class="submit">				
 				<input type="button" id="save_plugin_settings" style="padding:0px" title="Save AG Custom Admin configuration" class="button-primary" value="<?php _e('Save Changes') ?>" onClick="savePluginSettings()" />
 				</p>        
                                 
