@@ -53,15 +53,15 @@ function agca_setupXHR(){
 			request: {												
 			}
 		},
-		handle: function(data, send){
+		handle: function(data, send){	
 			if(data.success){													
 				var callbackFname = data.url.split('callback=')[1];
 				var fn = window[callbackFname];
 				if(fn != undefined){
 					fn(data);
 				}												
-			}else{
-				console.log(data);													
+			}else{ console.log('errr');
+				console.log(data.url);													
 				var url = data.url;													
 				if(url !== undefined && url != ""){
 					var cb = url.split('callback=')[1];
@@ -71,6 +71,8 @@ function agca_setupXHR(){
 							fn(data);
 						}	
 					}
+				}else{
+					printInitialAGCAError("Please update your browser in order to view AG Custom Admin templates.");
 				}
 			}					
 		}	
@@ -103,9 +105,7 @@ function agca_getConfiguration(){
 				console.log("EP:"+data.ep);													
 				templates_ep = data.ep;
 				if(data.error !=""){
-					jQuery('#agca_templates p.initialLoader').html(data.error);
-					jQuery('#agca_templates p').removeClass('initialLoader');
-					clearTimeout(agcaLoadingTimeOut);
+					printInitialAGCAError(data.error);
 				}else{
 					agca_getTemplates();
 				}													
@@ -115,6 +115,12 @@ function agca_getConfiguration(){
 			/*console.log("error " + textStatus);
 			console.log("incoming Text " + jqXHR.responseText);*/
 		});
+}
+
+function printInitialAGCAError(err){
+	jQuery('#agca_templates p.initialLoader').html(err);
+	jQuery('#agca_templates p').removeClass('initialLoader');
+	clearTimeout(agcaLoadingTimeOut);
 }
 
 function agca_getTemplate(template, key){
