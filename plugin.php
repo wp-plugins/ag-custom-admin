@@ -4,7 +4,7 @@ Plugin Name: AG Custom Admin
 Plugin URI: http://agca.argonius.com/ag-custom-admin/category/ag_custom_admin
 Description: Hide or change items in admin panel. Customize buttons from admin menu. Colorize admin and login page with custom colors.
 Author: Argonius
-Version: 1.2.8
+Version: 1.3
 Author URI: http://www.argonius.com/
 
 	Copyright 2013. Argonius (email : info@argonius.com)
@@ -33,6 +33,7 @@ class AGCA{
 	private $admin_capabilities;    	
     private $context = "";
     private $saveAfterImport = false;	
+	private $templateCustomizations = "";
 	private $templates_ep = "http://agca.argonius.com/configuration.php";
 	//private $templates_ep = "http://agca.argonius.com/debug.php";
 	public function __construct()
@@ -53,7 +54,7 @@ class AGCA{
 		/*Initialize properties*/		
 		$this->colorizer = $this->jsonMenuArray(get_option('ag_colorizer_json'),'colorizer');
                 //fb($this->colorizer);
-		$this->agca_version = "1.2.8";
+		$this->agca_version = "1.3";
 		
 		/*upload images programmaticaly*/
 		//TODO upload with AJAX one by one, use post data to send urls one by one
@@ -210,6 +211,7 @@ class AGCA{
 			return $admin_title;
 		}	
 	}
+	
 	function agca_get_includes() {            
             ?>		
                         <script type="text/javascript">
@@ -222,8 +224,9 @@ class AGCA{
 			<script type="text/javascript" src="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ?>script/ag_script.js?ver=<?php echo $this->agca_version; ?>"></script>	                        	
             <?php if($this->context == "admin"){ ?>
 				<script type="text/javascript" src="../wp-includes/js/tinymce/tiny_mce.js"></script>			
-			<?php } ?>       
-                       <?php
+			<?php } 					    
+						echo $this->templateCustomizations; 
+						
                         if(!((get_option('agca_role_allbutadmin')==true) and  (current_user_can($this->admin_capability())))){	
                             ?>
                              <style type="text/css">							 
@@ -237,9 +240,7 @@ class AGCA{
                                  ?>
                              </script>
                             <?php
-                        }
-                        ?>
-		<?php
+                        }			
 	}
 	
 	function agca_enqueue_scripts() {			
@@ -1088,45 +1089,9 @@ class AGCA{
 		}
 		return $selectedValue;
 	}
-
-	function print_admin_css()
-	{
-		$this->agca_get_includes();
-		$this->admin_capabilities();
-		$this->context = "admin";
-		get_currentuserinfo() ;		
-		$wpversion = $this->get_wp_version();			
-	?>	
-<?php
-	//in case that javaScript is disabled only admin can access admin menu
-	if(!current_user_can($this->admin_capability())){
-	?>
-		<style type="text/css">
-			#adminmenu{display:none;}
-		</style>
-	<?php
-	}
-?>	
-<script type="text/javascript">
-document.write('<style type="text/css">html{visibility:hidden;}</style>');
-<?php $this->finalErrorCheck(); ?>
-var wpversion = "<?php echo $wpversion; ?>";
-var agca_debug = <?php echo ($this->agca_debug)?"true":"false"; ?>;
-var agca_version = "<?php echo $this->agca_version; ?>";
-var errors = false;
-var isSettingsImport = false;
-var agca_context = "admin";
-var roundedSidberSize = 0;
-
-<?php
-if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='true'){
-    echo 'isSettingsImport = true;';
-}
-?>    
-</script>
-<?php 
- 
-	if(get_option( 'agca_templates' ) != ""){
+	
+	function prepareAGCAAdminTemplates(){
+		if(get_option( 'agca_templates' ) != ""){
 			//print_r(get_option( 'agca_templates' ));
 			$templates = get_option( 'agca_templates' );
 			foreach($templates as $templname=>$templdata){
@@ -1157,7 +1122,7 @@ if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='t
 							$value = $sett->default_value;						
 						}
 						
-						//Preapare settings					
+						//Prepare settings					
 						if($sett->type == 6){
 							if($value !== null && (strtolower($value) == "on" || $value == "1")){
 								$value = "true";
@@ -1173,29 +1138,87 @@ if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='t
 					$admindata = str_replace($wpversion."*/"," ", $admindata);
 					
 					//remove CSS comments
-					$admindata = preg_replace('#/\*.*?\*/#si','',$admindata);
+					$admindata = preg_replace('#/\*.*?\*/#si','',$admindata);					
 					
-					
-					echo $admindata;
-					//REPLACE TAGS WITH CUSTOM TEMPLATE SETTINGS
-					
-					//echo ($templdata['admin']);
+					//echo $admindata;
+					//REPLACE TAGS WITH CUSTOM TEMPLATE SETTINGS					
+					$this->templateCustomizations = $templdata['admin'];
 				 }				
 					break;
 				}
 			}
+		}
 	}
-  
 	
-  
-		
-?> 
+	function prepareAGCALoginTemplates(){
+		if(get_option( 'agca_templates' ) != ""){
+			//print_r(get_option( 'agca_templates' ));
+			$templates = get_option( 'agca_templates' );
+			foreach($templates as $templname=>$templdata){
+				if($templname == get_option('agca_selected_template')){
+					echo ($templdata['common']);
+					
+					$logindata = $templdata['login'];
+					
+					/*enable special CSS for this WP version*/
+					$logindata = str_replace("/*".$this->get_wp_version()," ", $logindata);
+					$logindata = str_replace($this->get_wp_version()."*/"," ", $logindata);
+					
+					//remove CSS comments
+					$logindata = preg_replace('#/\*.*?\*/#si','',$logindata);
+					
+					echo($logindata);
+					break;
+				}
+			}
+		}
+	}
+
+	function print_admin_css()
+	{
+		$wpversion = $this->get_wp_version();	
+		$this->context = "admin";
+		?>
+		<script type="text/javascript">
+			var wpversion = "<?php echo $wpversion; ?>";
+			var agca_debug = <?php echo ($this->agca_debug)?"true":"false"; ?>;
+			var agca_version = "<?php echo $this->agca_version; ?>";
+			var errors = false;
+			var isSettingsImport = false;
+			var agca_context = "admin";
+			var roundedSidberSize = 0;
+		</script>
+		<?php
+		$this->prepareAGCAAdminTemplates();
+		$this->agca_get_includes();
+		$this->admin_capabilities();		
+		get_currentuserinfo() ;		
+				
+	?>	
+<?php
+	//in case that javaScript is disabled only admin can access admin menu
+	if(!current_user_can($this->admin_capability())){
+	?>
+		<style type="text/css">
+			#adminmenu{display:none;}
+		</style>
+	<?php
+	}
+?>	
+<script type="text/javascript">
+document.write('<style type="text/css">html{visibility:hidden;}</style>');
+<?php $this->finalErrorCheck(); ?>
+<?php
+if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='true'){
+    echo 'isSettingsImport = true;';
+}
+?>    
+</script>
 <script type="text/javascript">
   /* <![CDATA[ */
-jQuery(document).ready(function() {	
-
+jQuery(document).ready(function() {
 try
-  {  
+  {  				
 				
 				<?php /*CHECK OTHER PLUGNS*/	
 					$this->check_active_plugin(); 
@@ -1591,34 +1614,24 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 	}
 	
 	function print_login_head(){
-		$this->context = "login";				
-		$this->agca_get_includes();		
+		$this->context = "login";	
 		$wpversion = $this->get_wp_version();
-	?>	
-		
-	     <script type="text/javascript">		 
+		?>
+		<script type="text/javascript">		 
 		 document.write('<style type="text/css">html{visibility:hidden;}</style>');
 		 <?php $this->finalErrorCheck(); ?>
 		 var agca_version = "<?php echo $this->agca_version; ?>";
 		 var wpversion = "<?php echo $wpversion; ?>";
 		 var agca_debug = <?php echo ($this->agca_debug)?"true":"false"; ?>;
-                 var isSettingsImport = false;
-                 var agca_context = "login";
-				 
+         var isSettingsImport = false;
+         var agca_context = "login";				 
 		</script>
-		<?php 
-		if(get_option( 'agca_templates' ) != ""){
-			//print_r(get_option( 'agca_templates' ));
-			$templates = get_option( 'agca_templates' );
-			foreach($templates as $templname=>$templdata){
-				if($templname == get_option('agca_selected_template')){
-					echo ($templdata['common']);
-					echo($templdata['login']);
-					break;
-				}
-			}
-		}
-		?> 	
+		<?php
+		$this->prepareAGCALoginTemplates();
+		$this->agca_get_includes();		
+		
+	?>	
+	     	
 		<script type="text/javascript">
 				 
 				 
@@ -2797,6 +2810,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 					<input type="hidden" id="templates_data" name="templates_data" value="" />								
 					<input type="hidden" id="templates_name" name="templates_name" value="" />			
 			</form>
+			<div id="agca_notification_box"><span></span></div>
 			
 			</div>
 							

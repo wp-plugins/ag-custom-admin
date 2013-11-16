@@ -225,9 +225,11 @@ td.ag_admin_menu_parent:hover{
 }
 
 /*templates*/
-#agca_templates{
-	
+#agca_templates .error{
+	padding:8px;
+	font-size: 14px;
 }
+
 .agca_template{
 	display:block;
 	float:left;
@@ -369,4 +371,17 @@ td.ag_admin_menu_parent:hover{
 }
 #agca_form  .agca-radiobox.checked[value=off]{
 	background:url(../images/radio-off.png);
+}
+#agca_notification_box{
+	background: none repeat scroll 0 0 #C6C6C6;
+    border: 1px solid #A9A9A9;
+    color: #FFFFFF;
+    display: none;
+    height: 8px;
+    padding: 5px 15px 15px;
+    position: fixed;
+    right: 10px;
+    top: 38px;
+    width: auto;
+    z-index: 99999;
 }

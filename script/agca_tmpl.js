@@ -30,7 +30,7 @@ function agca_getTemplatesCallback(data){
 	}else if(data.data == "PHP Error"){
 		data.data = "Error occurred on the server.";
 		agcaDebugObj(data);
-	}	
+	}		
 	jQuery('#agca_templates').html(data.data);	
 	jQuery('#advanced_template_options').show();	
 	jQuery(".template img").each(agcaApplyTooltip);
@@ -88,7 +88,7 @@ function agca_getTemplates(){
 			url: templates_ep + "service/client" + "&callback=agca_getTemplatesCallback",
 			method: "POST",														
 			callBack: agca_getTemplatesCallback,
-			data: {isPost:true}
+			data: {isPost:true, wpv:wpversion, agcav:agca_version}
 		});		
 }
 
@@ -130,7 +130,7 @@ function agca_getTemplate(template, key){
 			url: templates_ep + "service/gettemplate"+"&tmpl="+template+"&key="+key+"&callback=agca_getTemplateCallback",
 			method: "POST",														
 			callBack: agca_getTemplateCallback,
-			data:  {isPost:true}
+			data:  {isPost:true, wpv:wpversion, agcav:agca_version}
 		});	
 }
 
@@ -160,7 +160,7 @@ function agca_loadTemplateSettingsCore(template, isInitial){
 			url: templates_ep + "service/gettemplatesettings"+"&tmpl="+template+"&key=&callback="+calbName,
 			method: "POST",														
 			callBack: calb,
-			data:  {isPost:true}
+			data:  {isPost:true, wpv:wpversion, agcav:agca_version}
 		});
 		//alert('saving template settings for template:' + template_name);
 }
@@ -381,19 +381,49 @@ function agca_saveTemplateSettingsCore(template, settings, callback){
 		console.log('AGCA Error: agca_saveTemplateSettingsCore()');
 	});
 }*/
+function agca_notification_box(txt){
+	if(txt ==""){
+		jQuery('#agca_notification_box span').stop().css('opacity',1)
+		jQuery('#agca_notification_box').fadeOut('slow');
+	}else{
+		if(jQuery('#agca_notification_box').is(":visible")){
+			jQuery('#agca_notification_box span').stop();
+		}		
+		jQuery('#agca_notification_box').show();
+		jQuery('#agca_notification_box span').text(txt).animate({opacity:0},400,"linear",function(){
+			jQuery(this).animate({opacity:1},400,function(){agca_notification_box(txt);});
+		});
+	}
+}
 
 
 function agca_activateTemplate(template){
+	if(template_selected == template){
+		alert('Activating template...');
+		return false;
+	};
+	agca_notification_box('Activating template... Please wait...');
 	agcaDebug('FN:agca_activateTemplate('+template+')');
-	var url = window.location;								
-	jQuery.post(url,{"_agca_activate_template":template},
-	function(data){																				
-		window.location = 'tools.php?page=ag-custom-admin/plugin.php';
-	})
-	.fail(
-	function(){
-		console.log('AGCA Error: agca_activateTemplate()');
-	});
+	jQuery('input[name=agca_colorizer_turnonoff]').val("off");
+		
+	//ajax submit form	
+	var frm = jQuery('#agca_form');
+	jQuery.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                var url = window.location;								
+				jQuery.post(url,{"_agca_activate_template":template},
+				function(data){																				
+					window.location = 'tools.php?page=ag-custom-admin/plugin.php';
+				})
+				.fail(
+				function(){
+					console.log('AGCA Error: agca_activateTemplate()');
+				});
+            }
+     });
 }							
 
 function agca_removeAllTemplates(){
