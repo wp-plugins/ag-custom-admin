@@ -86,6 +86,7 @@ class AGCA{
 	function checkGET(){
 		if(isset($_GET['agca_action'])){
 			if($_GET['agca_action'] =="remove_templates"){
+				$this->delete_template_images_all();
 				update_option('agca_templates', "");
 				update_option('agca_selected_template', "");
 			}
@@ -152,30 +153,59 @@ class AGCA{
 			exit;
 		}else if(isset($_POST['_agca_upload_image'])){
 			
-		function my_sideload_image() {
-			$remoteurl = $_POST['_agca_upload_image'];			
-			$file = media_sideload_image( $remoteurl, 0 );			
-			$url=explode("'",explode("src='",$file)[1])[0];						
-			echo $url;
-			exit;
-			
-		}
-		add_action( 'admin_init', 'my_sideload_image' );
+			function my_sideload_image() {
+				$remoteurl = $_POST['_agca_upload_image'];			
+				$file = media_sideload_image( $remoteurl, 0 ,"AG Custom Admin Template Image (do not delete)");	
+				$url=explode("'",explode("src='",$file)[1])[0];						
+				echo $url;				
+				exit;				
+			}
+			add_action( 'admin_init', 'my_sideload_image' );
 		
-		}else if(isset($_POST['_agca_remove_template_images'])){
-			exit; //TODO: implement removing stored images before new images are created
-			//echo "template:"; echo $_POST['_agca_remove_template_images'];
-			$templates = get_option('agca_templates');
+		}else if(isset($_POST['_agca_remove_template_images'])){		
+			$this->delete_template_images($_POST['_agca_remove_template_images']);			
+			exit;
+		}
+	}
+	
+	function delete_template_images_all(){
+		$templates = get_option('agca_templates');			
 			if($templates != null && $templates != ""){
-				$template = $templates[$_POST['_agca_remove_template_images']];
+				foreach($templates as $template){
+					if($template != null && $template['images'] != null && $template['images'] != ""){
+						//print_r($template['images']);
+						$imgs = explode(',',$template['images']);
+						foreach($imgs as $imageSrc){
+							$this->delete_attachment_by_src($imageSrc);
+						}
+						//print_r($imgs);
+					}
+				}			
+			}
+		//print_r($templates);
+	}
+	
+	function delete_template_images($template_name){
+		$templates = get_option('agca_templates');			
+			if($templates != null && $templates != ""){
+				$template = $templates[$template_name];
 				if($template != null && $template['images'] != null && $template['images'] != ""){
+					//print_r($template['images']); exit;
 					$imgs = explode(',',$template['images']);
-					
+					foreach($imgs as $imageSrc){
+						$this->delete_attachment_by_src($imageSrc);
+					}
+					//print_r($imgs);
 				}
 			}
-			//print_r($templates);
-			exit;
-		}
+		//print_r($templates);
+	}
+	
+	function delete_attachment_by_src ($image_src) {
+		  global $wpdb;
+		  $query = "SELECT ID FROM {$wpdb->posts} WHERE guid='$image_src'";
+		  $id = $wpdb->get_var($query);
+		  wp_delete_attachment( $id, $true );
 	}
 	
 	function isGuest(){
@@ -1100,9 +1130,10 @@ class AGCA{
 					echo ($templdata['common']);
 					echo "<!--AGCAIMAGES: ".$templdata['images']."-->";
 				 if(!((get_option('agca_role_allbutadmin')==true) and  (current_user_can($this->admin_capability())))){	
-					if($templdata['settings'] == "") $templdata['settings'] = "{}";				
+					if($templdata['settings'] == "") $templdata['settings'] = "{}";		
+					//print_r($templdata);					
 					
-					echo "\n<script type=\"text/javascript\">";
+					echo "\n<script type=\"text/javascript\">\n";
 					echo "var agca_template_settings = ".$templdata['settings'].";\n";					
 					echo "</script>";
 					
@@ -1128,8 +1159,8 @@ class AGCA{
 								$value = "true";
 							}else{
 								$value = "false";
-							}
-						}
+							}						
+						}								
 						$admindata = str_replace("%".$key."%",$value, $admindata);						
 					}
 					
@@ -1142,7 +1173,7 @@ class AGCA{
 					
 					//echo $admindata;
 					//REPLACE TAGS WITH CUSTOM TEMPLATE SETTINGS					
-					$this->templateCustomizations = $templdata['admin'];
+					$this->templateCustomizations = $admindata;
 				 }				
 					break;
 				}

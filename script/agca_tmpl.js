@@ -312,11 +312,9 @@ function agca_getTemplateSettingsCallback(data){
 function agca_saveTemplateSettingsInitial(template, settings){	
 	agcaDebug('FN:agca_saveTemplateSettingsInitial()');
 	var originalText = jQuery("#templates_data").val();	
-	jQuery("#templates_data").val(originalText+"|||"+JSON.stringify(settings));	
-	agca_removePreviousTemplateImages();		
+	jQuery("#templates_data").val(originalText+"|||"+JSON.stringify(settings));
+	agca_removeTemplateImages(template, agca_startUploadingRemoteImages);		
 }
-
-
 
 function agca_saveTemplateSettingsFromForm(template){
 	agcaDebug('FN:agca_saveTemplateSettingsFromForm()');
@@ -398,11 +396,16 @@ function agca_notification_box(txt){
 
 
 function agca_activateTemplate(template){
-	if(template_selected == template){
-		alert('Activating template...');
+	if(template_selected == ""){
+		alert('There are no active templates to deactivate.');
 		return false;
 	};
-	agca_notification_box('Activating template... Please wait...');
+	if(template == ""){
+		agca_notification_box('Deactivating template... Please wait...');
+	}else{
+		agca_notification_box('Activating template... Please wait...');
+	}
+	
 	agcaDebug('FN:agca_activateTemplate('+template+')');
 	jQuery('input[name=agca_colorizer_turnonoff]').val("off");
 		
@@ -433,7 +436,10 @@ function agca_removeAllTemplates(){
 
 function agca_removeAllTemplatesConfirmed(){
 	agcaDebug('FN:agca_removeAllTemplatesConfirmed()');
-	window.location = 'tools.php?page=ag-custom-admin/plugin.php&agca_action=remove_templates';										
+	agca_notification_box('Removing all templates... Please wait...');	
+	window.setTimeout(function(){
+		window.location = 'tools.php?page=ag-custom-admin/plugin.php&agca_action=remove_templates';										
+	},2000);	
 }
 
 function handleLocalyStoredImages(){
@@ -465,26 +471,34 @@ function agca_updateInstallProgress(){
 	
 	jQuery('.agca_content #activating').text('Installing ('+text+') ...');
 }
-
-function agca_removePreviousTemplateImages(){	
-	agcaDebug('FN:agca_removePreviousTemplateImages()');
-	/*var url = window.location;								
+function agca_removeTemplateImages(template_name, callBack){
+	agcaDebug('FN:agca_removeTemplateImages()');
+	var url = window.location;								
 	jQuery.post(url,{"_agca_remove_template_images":template_name},
 		function(data){																				
-		  console.log(data);									
+		  console.log(data);
+			if(callBack != null){
+				callBack();
+			}
 	})
 	.fail(
 		function(e){
-		console.log('AGCA Error: agca_removePreviousTemplateImages()');
+		console.log('AGCA Error: agca_removeTemplateImages()');
 		console.log(e);
-	});*/
-	agcaDebug('templates data');
-	agcaDebug(jQuery("#templates_data").val());
-	//upload remote images on callback	
+		if(callBack != null){
+				callBack();
+		}
+	});	
+}
+function agca_startUploadingRemoteImages(){	
+	agcaDebug('FN:agca_startUploadingRemoteImages()');
+	
+	//agcaDebug('templates data');
+	//agcaDebug(jQuery("#templates_data").val());
+	//upload remote images on callback		
 	if(typeof agca_remote_images != 'undefined'){
 		agca_uploadRemoteImages();
-	}else{
-		//TODO test moday with 1B1F1F37-6DEB-61FB-B24A-D2E122A69575
+	}else{		
 		jQuery("#templates_data").val(jQuery("#templates_data").val()+"|||");
 		
 		//SAVE FINALY PAYED

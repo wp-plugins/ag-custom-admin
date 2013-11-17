@@ -182,6 +182,9 @@ td.ag_admin_menu_parent:hover{
 #agca_form textarea{
     width:400px;    
 }
+#agca_form textarea.wp-editor-area{
+    width:100%;    
+}
 #agca_form textarea:hover{
     background-color: #efffef;    
 }
