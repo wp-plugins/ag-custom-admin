@@ -1120,6 +1120,52 @@ class AGCA{
 		return $selectedValue;
 	}
 	
+	function JSPrintAGCATemplateSettingsVar($settings){
+		echo "\n<script type=\"text/javascript\">\n";
+		echo "var agca_template_settings = ".$settings.";\n";					
+		echo "</script>";	
+	}
+	
+	function appendSettingsToAGCATemplateCustomizations($customizations, $settings){
+		$template_settings = json_decode($settings);
+	    //print_r($template_settings);
+		foreach($template_settings as $sett){
+			$key = $sett->code;
+							
+			//use default value if user's value is not set
+			$value="";
+			if($sett->value != ""){
+				$value = $sett->value;						
+			}else{
+				$value = $sett->default_value;						
+			}
+			
+			//Prepare settings					
+			if($sett->type == 6){
+				if($value !== null && (strtolower($value) == "on" || $value == "1")){
+					$value = "true";
+				}else{
+					$value = "false";
+				}						
+			}								
+			$customizations = str_replace("%".$key."%",$value, $customizations);						
+		}	
+		return $customizations;
+	}
+	
+	function enableSpecificWPVersionCustomizations($customizations){	
+		/*enable special CSS for this WP version*/	
+		$ver = $this->get_wp_version();		
+		$customizations = str_replace("/*".$ver," ", $customizations);
+		$customizations = str_replace($ver."*/"," ", $customizations);
+		return $customizations;
+	}
+	
+	function removeCSSComments($customizations){				
+		$customizations = preg_replace('#/\*.*?\*/#si','',$customizations);
+		return $customizations;
+	}
+	
 	function prepareAGCAAdminTemplates(){
 		if(get_option( 'agca_templates' ) != ""){
 			//print_r(get_option( 'agca_templates' ));
@@ -1131,45 +1177,13 @@ class AGCA{
 					echo "<!--AGCAIMAGES: ".$templdata['images']."-->";
 				 if(!((get_option('agca_role_allbutadmin')==true) and  (current_user_can($this->admin_capability())))){	
 					if($templdata['settings'] == "") $templdata['settings'] = "{}";		
-					//print_r($templdata);					
+					//print_r($templdata);															
 					
-					echo "\n<script type=\"text/javascript\">\n";
-					echo "var agca_template_settings = ".$templdata['settings'].";\n";					
-					echo "</script>";
+					$this->JSPrintAGCATemplateSettingsVar($templdata['settings']);
 					
-					//REPLACE TAGS WITH CUSTOM TEMPLATE SETTINGS
-					$template_settings = json_decode($templdata['settings']);
-					$admindata = $templdata['admin'];					
-														
-					//print_r($template_settings);
-					foreach($template_settings as $sett){
-						$key = $sett->code;
-										
-						//use default value if user's value is not set
-						$value="";
-						if($sett->value != ""){
-							$value = $sett->value;						
-						}else{
-							$value = $sett->default_value;						
-						}
-						
-						//Prepare settings					
-						if($sett->type == 6){
-							if($value !== null && (strtolower($value) == "on" || $value == "1")){
-								$value = "true";
-							}else{
-								$value = "false";
-							}						
-						}								
-						$admindata = str_replace("%".$key."%",$value, $admindata);						
-					}
-					
-					/*enable special CSS for this WP version*/
-					$admindata = str_replace("/*".$wpversion," ", $admindata);
-					$admindata = str_replace($wpversion."*/"," ", $admindata);
-					
-					//remove CSS comments
-					$admindata = preg_replace('#/\*.*?\*/#si','',$admindata);					
+					$admindata = $this->appendSettingsToAGCATemplateCustomizations($templdata['admin'], $templdata['settings']);	
+					$admindata = $this->enableSpecificWPVersionCustomizations($admindata);
+					$admindata = $this->removeCSSComments($admindata);											
 					
 					//echo $admindata;
 					//REPLACE TAGS WITH CUSTOM TEMPLATE SETTINGS					
@@ -1187,16 +1201,14 @@ class AGCA{
 			$templates = get_option( 'agca_templates' );
 			foreach($templates as $templname=>$templdata){
 				if($templname == get_option('agca_selected_template')){
-					echo ($templdata['common']);
+					echo ($templdata['common']);				
 					
-					$logindata = $templdata['login'];
+					if($templdata['settings'] == "") $templdata['settings'] = "{}";						
+					$this->JSPrintAGCATemplateSettingsVar($templdata['settings']);
 					
-					/*enable special CSS for this WP version*/
-					$logindata = str_replace("/*".$this->get_wp_version()," ", $logindata);
-					$logindata = str_replace($this->get_wp_version()."*/"," ", $logindata);
-					
-					//remove CSS comments
-					$logindata = preg_replace('#/\*.*?\*/#si','',$logindata);
+					$logindata = $this->appendSettingsToAGCATemplateCustomizations($templdata['login'], $templdata['settings']);					
+					$logindata = $this->enableSpecificWPVersionCustomizations($logindata);
+					$logindata = $this->removeCSSComments($logindata);				
 					
 					echo($logindata);
 					break;
@@ -1652,7 +1664,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 		 document.write('<style type="text/css">html{visibility:hidden;}</style>');
 		 <?php $this->finalErrorCheck(); ?>
 		 var agca_version = "<?php echo $this->agca_version; ?>";
-		 var wpversion = "<?php echo $wpversion; ?>";
+		 <?php //var wpversion = "echo $wpversion; ?>
 		 var agca_debug = <?php echo ($this->agca_debug)?"true":"false"; ?>;
          var isSettingsImport = false;
          var agca_context = "login";				 

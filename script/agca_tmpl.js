@@ -233,6 +233,11 @@ function agca_getTemplateSettingsCallback(data){
 						}
 					}
 					
+					//if current value is still not defined, use default value
+					if(currentValue == ""){
+						currentValue = settings[ind].default_value;
+					}
+					
 					if(type==1){
 						text = "<p>"+settings[ind].title+"</p><input type=\"text\" name=\"agcats_"+settings[ind].name+"\" value=\""+currentValue+"\" default_value=\""+settings[ind].default_value+"\" code=\""+settings[ind].name+"\" class=\"setting\" stype=\"1\" /></br>";															
 					}else if(type==2){
