@@ -200,9 +200,10 @@ function agca_getTemplateSettingsInitialCallback(data){
 		agca_saveTemplateSettingsInitial(template_selected, filteredSettings);
 	}
 }
-
+/*template settings - load them to UI popup window*/
 function agca_getTemplateSettingsCallback(data){
 	agcaDebug('FN:agca_getTemplateSettingsCallback()');	
+	//console.log(data.data);
 	
 	if(data.success == 0){
 		//alert(data.data);
@@ -237,7 +238,7 @@ function agca_getTemplateSettingsCallback(data){
 					if(currentValue == ""){
 						currentValue = settings[ind].default_value;
 					}
-					
+					/*text*/
 					if(type==1){
 						text = "<p>"+settings[ind].title+"</p><input type=\"text\" name=\"agcats_"+settings[ind].name+"\" value=\""+currentValue+"\" default_value=\""+settings[ind].default_value+"\" code=\""+settings[ind].name+"\" class=\"setting\" stype=\"1\" /></br>";															
 					}else if(type==2){
@@ -263,18 +264,18 @@ function agca_getTemplateSettingsCallback(data){
 						}
 						text = "<p>"+settings[ind].title+"</p><input type=\"checkbox\" name=\"agcats_"+settings[ind].name+"\" class=\"setting\" default_value=\""+settings[ind].default_value+"\"  code=\""+settings[ind].name+"\" stype=\"6\" "+currentValue+" /></br>";															
 					}else if(type==7){
-						text = "<p>"+settings[ind].title+"</p><div name=\"agcats_"+settings[ind].name+"\" class=\"setting\" code=\""+settings[ind].name+"\" default_value=\""+settings[ind].default_value+"\" stype=\"7\" style=\"margin-left: 10px;\">";															
+						text = "<p>"+settings[ind].title+"</p><div name=\"agcats_"+settings[ind].name+"\" class=\"setting\" code=\""+settings[ind].name+"\" default_value=\""+settings[ind].default_value+"\" stype=\"7\" style=\"padding-left: 10px;color:white;\">";															
 						var options = settings[ind].default_value.split(',');
 						for(var indopt in options){
 							var sel = "";
 							if(currentValue == options[indopt]){
 								sel = " checked ";
 							}
-							text+="<input name=\"agcats_"+settings[ind].name+"_val\" style=\"margin:5px;margin-right:6px;\" type=\"radio\" value="+options[indopt]+" "+sel+" name=\"sd\"/>"+options[indopt]+"</br>";
+							text+="<input name=\"agcats_"+settings[ind].name+"_val\" style=\"margin-right:6px;\" type=\"radio\" value="+options[indopt]+" "+sel+" name=\"sd\"/>"+options[indopt]+"</br>";
 						}						
 						text+="</div>";
 					}
-					jQuery('#agca_template_settings').prepend(text);
+					jQuery('#agca_template_settings').append(text);
 					
 					//TODO: do similar to options above, clean a code up a litle bit, add them dinamicaly all attributes instead of inline adding
 					jQuery('.agca_form_0100_div .agca_form_decr').click(function(){
@@ -352,7 +353,7 @@ function agca_saveTemplateSettingsFromForm(template){
 		
 	});
 	
-	jQuery('#agca_template_settings').html("<h3>Applying template settings...</h3>");
+	jQuery('#agca_template_settings').html("<p>Applying template settings...</p>");
 	agca_saveTemplateSettingsCore(template, settings, function(data){																				
 		window.location = 'tools.php?page=ag-custom-admin/plugin.php';		
 	});
