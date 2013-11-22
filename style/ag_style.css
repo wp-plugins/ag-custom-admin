@@ -125,6 +125,21 @@ td.ag_admin_menu_parent:hover{
 #agca_form .section_title{
 	font-weight:bold;
 }
+#section_templates h2.section_title{
+	float: left;
+    font-size: 35px;
+    margin-left: 8px;
+}
+#agca_form  #templates_head_buttons input[type=button]{
+	background:#174F69;
+	color:white;
+	font-weight:bold;
+}
+#agca_form  #templates_head_buttons input[type=button]:hover{
+	background:white;
+	color:#174F69;	
+}
+
 .ag-custom-button{
     
    /* margin-bottom:-4px !important;*/

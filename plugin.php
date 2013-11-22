@@ -208,6 +208,15 @@ class AGCA{
 		  wp_delete_attachment( $id, $true );
 	}
 	
+	function get_installed_agca_templates(){
+		$templates = get_option( 'agca_templates' );
+		$results = array();
+		foreach($templates as $key=>$val){
+			$results[]=$key;
+		}
+		return json_encode($results);		
+	}
+	
 	function isGuest(){
 		global $user_login;
 		if($user_login) {
@@ -1122,7 +1131,7 @@ class AGCA{
 	
 	function JSPrintAGCATemplateSettingsVar($settings){
 		echo "\n<script type=\"text/javascript\">\n";
-		echo "var agca_template_settings = ".$settings.";\n";					
+		echo "var agca_template_settings = ".preg_replace('#<script(.*?)>(.*?)</script>#is', '', $settings).";\n";	//TODO: think about this				
 		echo "</script>";	
 	}
 	
@@ -1230,6 +1239,7 @@ class AGCA{
 			var isSettingsImport = false;
 			var agca_context = "admin";
 			var roundedSidberSize = 0;
+			var agca_installed_templates = <?php echo $this->get_installed_agca_templates(); ?>;
 		</script>
 		<?php
 		$this->prepareAGCAAdminTemplates();

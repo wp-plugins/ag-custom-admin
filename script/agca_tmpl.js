@@ -7,8 +7,11 @@ var agcaLoadingTimeOut = null;
 function agca_getTemplateCallback(data){	
 	agcaDebug('FN:agca_getTemplateCallback()');
 	agcaDebug(JSON.stringify(data));
+	
 	if(data.success == 0){
 		alert(data.data);
+		//TODO:make info message work
+		//agcaInfoMessage("Error",data.data, null);
 		jQuery('#agca_template_popup').hide();
 	}else{
 		jQuery("#templates_name").val(template_name);
@@ -33,7 +36,8 @@ function agca_getTemplatesCallback(data){
 	}		
 	jQuery('#agca_templates').html(data.data);	
 	jQuery('#advanced_template_options').show();	
-	jQuery(".template img").each(agcaApplyTooltip);
+	jQuery("#agca_installed_templates .template img").each(agcaApplyTooltip);
+	jQuery("#agca_loaded_templates .template img").each(agcaApplyTooltip);
 }			
 function agca_client_init(){
 	agcaDebug('FN:agca_client_init()');
@@ -82,13 +86,16 @@ function agca_setupXHR(){
 function agca_getTemplates(){
 	agcaDebug('FN:agca_getTemplates()');
 //agca_uploadRemoteImage('http://www.neowing.co.jp/idol_site2/image/FDGD-21/fdgd-21-top.jpg');	
-	agca_setupXHR();			
+	agca_setupXHR();	
+if(typeof agca_active_template_version === 'undefined'){
+	agca_active_template_version = "";
+}
 	
 	xhr.request({
 			url: templates_ep + "service/client" + "&callback=agca_getTemplatesCallback",
 			method: "POST",														
 			callBack: agca_getTemplatesCallback,
-			data: {isPost:true, wpv:wpversion, agcav:agca_version}
+			data: {isPost:true, wpv:wpversion, agcav:agca_version,selected:template_selected,installed:agca_installed_templates,template_version:agca_active_template_version}
 		});		
 }
 
@@ -211,6 +218,11 @@ function agca_getTemplateSettingsCallback(data){
 	}else{		
 		var settings = "";
 		try{
+			if(data.data.substring(0, "Exception:".length) === "Exception:"){				
+				var errr= data.data.substr(10);
+				jQuery('#agca_template_settings .agca_loader').html(errr);
+				return false;
+			}
 			settings = JSON.parse(data.data);
 			if(settings.length == 0){
 				jQuery('#agca_template_settings .agca_loader').html("Additional settings are not available for this template");
@@ -402,10 +414,10 @@ function agca_notification_box(txt){
 
 
 function agca_activateTemplate(template){
-	if(template_selected == ""){
+	/*if(template_selected == ""){
 		alert('There are no active templates to deactivate.');
 		return false;
-	};
+	};*/
 	if(template == ""){
 		agca_notification_box('Deactivating template... Please wait...');
 	}else{
@@ -437,7 +449,7 @@ function agca_activateTemplate(template){
 
 function agca_removeAllTemplates(){
 	agcaDebug('FN:agca_removeAllTemplates()');
-	yesnoPopup("Are you sure? All installed templates will be removed?",agca_removeAllTemplatesConfirmed);										
+	yesnoPopup("Confirm","Are you sure? All installed templates will be removed completely?",agca_removeAllTemplatesConfirmed);										
 }
 
 function agca_removeAllTemplatesConfirmed(){
