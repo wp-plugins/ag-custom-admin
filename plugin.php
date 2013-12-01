@@ -22,7 +22,7 @@ Author URI: http://www.argonius.com/
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-	
+
 $agca = new AGCA();
 
 class AGCA{
@@ -123,6 +123,21 @@ class AGCA{
 			
 			$_POST = array();
 			
+		}else if(isset($_POST['_agca_templates_session'])){			
+			$this->agcaAdminSession();
+			if($_POST['template'] !="")
+				$_SESSION["AGCA"]["Templates"][$_POST['template']] = array("license"=>$_POST['license']);			
+			
+			print_r($_SESSION);
+			echo "_agca_templates_session:OK";
+			exit;
+		}else if(isset($_POST['_agca_templates_session_remove_license'])){			
+			$this->agcaAdminSession();
+			if($_POST['template'] !="")
+				$_SESSION["AGCA"]["Templates"][$_POST['template']] = null;						
+			print_r($_SESSION);
+			echo "_agca_templates_session_remove_license:OK";
+			exit;
 		}else if(isset($_POST['_agca_get_templates'])){
 			$templates = get_option( 'agca_templates' );
 			$results = array();
@@ -1204,6 +1219,39 @@ class AGCA{
 		}
 	}
 	
+	function agcaAdminSession(){
+		$agcaTemplatesSession = array();
+		
+		//session_destroy();
+		//session_unset();
+		
+		if(!session_id()){
+			session_start();			
+		}
+		
+		if(!isset($_SESSION["AGCA"])){
+			$_SESSION["AGCA"] = array();			
+			$_SESSION["AGCA"]["Templates"] = array();				
+		}
+		//print_r($_SESSION);
+		
+		if(isset($_SESSION["AGCA"])){
+			if(isset($_SESSION["AGCA"]["Templates"])){
+				//print_r($_SESSION["AGCA"]["Templates"]);
+				$agcaTemplatesSession = json_encode($_SESSION["AGCA"]["Templates"]);				
+			}
+		}
+		
+		
+		if($agcaTemplatesSession == '""' || $agcaTemplatesSession == '"[]"'){	
+			$agcaTemplatesSession = array();
+		}
+		
+		
+		return $agcaTemplatesSession;
+		
+	}
+	
 	function prepareAGCALoginTemplates(){
 		if(get_option( 'agca_templates' ) != ""){
 			//print_r(get_option( 'agca_templates' ));
@@ -1227,7 +1275,8 @@ class AGCA{
 	}
 
 	function print_admin_css()
-	{
+	{	
+		$agcaTemplateSession = $this->agcaAdminSession();
 		$wpversion = $this->get_wp_version();	
 		$this->context = "admin";
 		?>
@@ -1235,10 +1284,11 @@ class AGCA{
 			var wpversion = "<?php echo $wpversion; ?>";
 			var agca_debug = <?php echo ($this->agca_debug)?"true":"false"; ?>;
 			var agca_version = "<?php echo $this->agca_version; ?>";
+			var agcaTemplatesSession = <?php echo ($agcaTemplateSession==null)?"[]":$agcaTemplateSession; ?>;
 			var errors = false;
 			var isSettingsImport = false;
 			var agca_context = "admin";
-			var roundedSidberSize = 0;
+			var roundedSidberSize = 0;		
 			var agca_installed_templates = <?php echo $this->get_installed_agca_templates(); ?>;
 		</script>
 		<?php
@@ -1416,7 +1466,7 @@ try
 							}
 					<?php } ?>
 					<?php if(get_option('agca_dashboard_text')!=""){ ?>							
-							jQuery("#dashboard-widgets-wrap").parent().find("h2").text("<?php echo get_option('agca_dashboard_text'); ?>");
+							jQuery("#dashboard-widgets-wrap").parent().find("h2").html("<?php echo addslashes(get_option('agca_dashboard_text')); ?>");
 					<?php } ?>
 					<?php if(get_option('agca_dashboard_text_paragraph')!=""){ ?>	
                                                         jQuery("#wpbody-content #dashboard-widgets-wrap").before('<div id="agca_custom_dashboard_content"></div>');
@@ -2787,8 +2837,8 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 									<div id="advanced_template_options" style="display:none">
 										<h4>Advanced Template Actions</h4>
 										<p style="color:red;"><strong>WARNING:</strong> Use these template actions only if you are experiencing some problems with AGCA templates. With these options you can deactivate or remove all installed templates.</p>
-										<p><a href="javascript:agca_activateTemplate('');">DEACTIVATE ALL TEMPLATES</a> - templates will be deactivated, but still installed.</p>
-										<p><a href="javascript:agca_removeAllTemplates();">REMOVE ALL TEMPLATES</a> - installed templates will be removed.</p>										
+										<p><a href="javascript:agca_activateTemplate('');" title="When used, currently applied AGCA template will be disabled</br>and WordPress will use default admin UI.</br>Templates will not be removed, and you can use them again.">DEACTIVATE CURRENT TEMPLATE</a> - templates will be deactivated, but still installed.</p>
+										<p><a href="javascript:agca_removeAllTemplates();" title="All templates will be removed, including all template settings and customizations.</br>If you're using commercial template, you can install it again on the same site and activation will not be charged">REMOVE ALL TEMPLATES</a> - installed templates will be removed.</p>										
 									</div>
 								</td>
 							</tr>
@@ -2862,9 +2912,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 					<input type="hidden" name="_agca_save_template" value="true" />
 					<input type="hidden" id="templates_data" name="templates_data" value="" />								
 					<input type="hidden" id="templates_name" name="templates_name" value="" />			
-			</form>
-			<div id="agca_notification_box"><span></span></div>
-			
+			</form>		
 			</div>
 							
 										<br />

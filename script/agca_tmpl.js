@@ -6,24 +6,40 @@ var agcaLoadingTimeOut = null;
 
 function agca_getTemplateCallback(data){	
 	agcaDebug('FN:agca_getTemplateCallback()');
-	agcaDebug(JSON.stringify(data));
-	
+	agcaDebug(JSON.stringify(data));	
 	if(data.success == 0){
-		alert(data.data);
-		//TODO:make info message work
-		//agcaInfoMessage("Error",data.data, null);
+		//alert(data.data);	
+		agcaInfoMessage("Error",data.data);
 		jQuery('#agca_template_popup').hide();
 	}else{
 		jQuery("#templates_name").val(template_name);
 		var parts = data.data.split("||||");
 		jQuery("#templates_data").val(parts[1]);	
 		//console.log(jQuery("#templates_data").val());
-		jQuery("body").append(parts[0]);
+		jQuery("body").append(parts[0]);		
 						
 		//load settings
 		agca_loadTemplateSettingsInitial(template_name);	
 	}																			
 }		
+
+function agca_getTemplateByLicenseKeyCallback(data){	
+	agcaDebug('FN:agca_getTemplateByLicenseKeyCallback()');
+	agcaDebug(JSON.stringify(data));	
+	if(data.success == 0){		
+		agcaInfoMessage("Error",data.data);		
+	}else{
+		if(data.data.length < 100){
+			template_selected = data.data;
+			var key = agcaTemplatesSessionGetLicenseKey(template_selected);
+			agcaProgress('Loading template... Please wait...');			
+			agca_getTemplate(template_selected,key);
+		}else{
+			agcaDebug("Uknown template name" + data.data);
+		}
+		
+	}																			
+}
 
 function agca_getTemplatesCallback(data){
 	agcaDebug('FN:agca_getTemplatesCallback()');	
@@ -38,6 +54,7 @@ function agca_getTemplatesCallback(data){
 	jQuery('#advanced_template_options').show();	
 	jQuery("#agca_installed_templates .template img").each(agcaApplyTooltip);
 	jQuery("#agca_loaded_templates .template img").each(agcaApplyTooltip);
+	jQuery('#advanced_template_options a').each(agcaApplyTooltip);
 }			
 function agca_client_init(){
 	agcaDebug('FN:agca_client_init()');
@@ -131,12 +148,26 @@ function printInitialAGCAError(err){
 }
 
 function agca_getTemplate(template, key){
-	agcaDebug('FN:agca_getTemplate()');
-	template_name = template;
+	agcaDebug('FN:agca_getTemplate()');	
+	template_name = template;	
+	if(!agcaTemplatesSessionIsLicenseSet(template)){
+		agcaTemplatesSessionAdd(template, key);
+	}	
 	xhr.request({
 			url: templates_ep + "service/gettemplate"+"&tmpl="+template+"&key="+key+"&callback=agca_getTemplateCallback",
 			method: "POST",														
 			callBack: agca_getTemplateCallback,
+			data:  {isPost:true, wpv:wpversion, agcav:agca_version}
+		});	
+}
+
+function agca_getTemplateByLicenseKey(key){
+	agcaDebug('FN:agca_getTemplateByLicenseKey('+key+')');	
+	//template_name = template;	
+	xhr.request({
+			url: templates_ep + "service/gettemplatebylk"+"&tmpl=&key="+key+"&callback=agca_getTemplateByLicenseKeyCallback",
+			method: "POST",														
+			callBack: agca_getTemplateByLicenseKeyCallback,
 			data:  {isPost:true, wpv:wpversion, agcav:agca_version}
 		});	
 }
@@ -156,15 +187,21 @@ function agca_loadTemplateSettingsCore(template, isInitial){
 	template_name = template;
 	template_selected = template;
 	
+	var licenseKey = "";
+	if(agcaTemplatesSession[template] != null && agcaTemplatesSession[template]['license'] != null){
+		licenseKey = agcaTemplatesSession[template]['license'];
+	}
+	
 	var calb = agca_getTemplateSettingsCallback;
 	var calbName = "agca_getTemplateSettingsCallback";
 	
 	if(isInitial){
+		agcaProgress("Loading template settings...");
 		calb = agca_getTemplateSettingsInitialCallback;
 		calbName = "agca_getTemplateSettingsInitialCallback";
 	}
 	xhr.request({
-			url: templates_ep + "service/gettemplatesettings"+"&tmpl="+template+"&key=&callback="+calbName,
+			url: templates_ep + "service/gettemplatesettings"+"&tmpl="+template+"&key="+licenseKey+"&callback="+calbName,
 			method: "POST",														
 			callBack: calb,
 			data:  {isPost:true, wpv:wpversion, agcav:agca_version}
@@ -174,8 +211,9 @@ function agca_loadTemplateSettingsCore(template, isInitial){
 
 function agca_getTemplateSettingsInitialCallback(data){ 
 	agcaDebug('FN:agca_getTemplateSettingsInitialCallback()');
-    agcaDebug(JSON.stringify(data));
+    agcaDebug(JSON.stringify(data));	
 	if(data.success == 0){
+		agcaInfoMessage("Error",data.data);
 		//TODO - what if template is loaded, but settings are not?
 		console.log('ERR:template settings are not loaded');
 	}else{		
@@ -212,10 +250,12 @@ function agca_getTemplateSettingsCallback(data){
 	agcaDebug('FN:agca_getTemplateSettingsCallback()');	
 	//console.log(data.data);
 	
-	if(data.success == 0){
+	if(data.success == 0){			
+		agcaTemplatesSessionRemove(template_selected);
 		//alert(data.data);
 		jQuery('#agca_template_settings .agca_loader').html(data.data);
 	}else{		
+	
 		var settings = "";
 		try{
 			if(data.data.substring(0, "Exception:".length) === "Exception:"){				
@@ -397,21 +437,6 @@ function agca_saveTemplateSettingsCore(template, settings, callback){
 		console.log('AGCA Error: agca_saveTemplateSettingsCore()');
 	});
 }*/
-function agca_notification_box(txt){
-	if(txt ==""){
-		jQuery('#agca_notification_box span').stop().css('opacity',1)
-		jQuery('#agca_notification_box').fadeOut('slow');
-	}else{
-		if(jQuery('#agca_notification_box').is(":visible")){
-			jQuery('#agca_notification_box span').stop();
-		}		
-		jQuery('#agca_notification_box').show();
-		jQuery('#agca_notification_box span').text(txt).animate({opacity:0},400,"linear",function(){
-			jQuery(this).animate({opacity:1},400,function(){agca_notification_box(txt);});
-		});
-	}
-}
-
 
 function agca_activateTemplate(template){
 	/*if(template_selected == ""){
@@ -419,9 +444,9 @@ function agca_activateTemplate(template){
 		return false;
 	};*/
 	if(template == ""){
-		agca_notification_box('Deactivating template... Please wait...');
+		agcaProgress('Deactivating template... Please wait...');
 	}else{
-		agca_notification_box('Activating template... Please wait...');
+		agcaProgress('Activating template... Please wait...');
 	}
 	
 	agcaDebug('FN:agca_activateTemplate('+template+')');
@@ -454,7 +479,7 @@ function agca_removeAllTemplates(){
 
 function agca_removeAllTemplatesConfirmed(){
 	agcaDebug('FN:agca_removeAllTemplatesConfirmed()');
-	agca_notification_box('Removing all templates... Please wait...');	
+	agcaProgress('Removing all templates... Please wait...');	
 	window.setTimeout(function(){
 		window.location = 'tools.php?page=ag-custom-admin/plugin.php&agca_action=remove_templates';										
 	},2000);	
@@ -485,9 +510,9 @@ function agca_updateInstallProgress(){
 	agcaDebug('FN:agca_updateInstallProgress()');
 	agca_local_images_count++;
 	var current = agca_remote_images_count - agca_local_images_count;
-	var text = agca_local_images_count +"/" + (parseInt(agca_remote_images_count)-1);
+	var proc= (agca_local_images_count / (parseInt(agca_remote_images_count)-1)).toFixed(2) * 100;
 	
-	jQuery('.agca_content #activating').text('Installing ('+text+') ...');
+	agcaProgress('Installing ('+proc+'%) ...');
 }
 function agca_removeTemplateImages(template_name, callBack){
 	agcaDebug('FN:agca_removeTemplateImages()');
@@ -534,7 +559,8 @@ function agca_uploadRemoteImages(){
 		break;
 	}				
 	if(!found){
-		jQuery('.agca_content #activating').text('Installation successful. Reloading...');
+		//jQuery('.agca_content #activating').text('Installation successful. Reloading...');
+		agcaProgress('Installation successful. Reloading...');
 		window.setTimeout(handleLocalyStoredImages,2000);
 	}
 }
@@ -618,4 +644,96 @@ function checkIfTemplatesAreLoaded(pass){
 		},10000);
 	}										
 }
-							
+
+function agcaTemplatesSessionIsLicenseSet(template){
+	agcaDebug("FN:agcaTemplatesSessionIsLicenseSet(" + template + ")");
+	if(agcaTemplatesSession[template] != null && agcaTemplatesSession[template]["license"] != null){
+		return true;
+	}
+	return false;
+}
+
+function agcaTemplatesSessionGetLicenseKey(template){
+	agcaDebug("FN:agcaTemplatesSessionGetLicenseKey(" + template + ")");
+	if(agcaTemplatesSession[template] != null && agcaTemplatesSession[template]["license"] != null){
+		return agcaTemplatesSession[template]["license"];
+	}
+	return "";
+}
+
+function agcaTemplatesSessionAdd(template, license, callback){
+	agcaDebug("FN:agcaTemplatesSessionAdd(" + template + ", " + license + ", callback)");
+	if(callback == null){
+		callback = function(){};
+	}	
+	agcaTemplatesSession[template] = {};
+	agcaTemplatesSession[template]["license"] = license;
+	jQuery.ajax({
+	  type: "POST",
+	  url: window.location,
+	  data: {
+		"_agca_templates_session" : "true",
+		"template":template,
+		"license":license
+		},
+	  success: callback	  
+	});
+	//agcaTemplatesSession
+}
+
+function agcaTemplatesSessionRemove(template, callback){
+	agcaDebug("FN:agcaTemplatesSessionRemove(" + template + ", callback)");
+	if(callback == null){
+		callback = function(){};
+	}	
+	agcaTemplatesSession[template]["license"] = null;
+	jQuery.ajax({
+	  type: "POST",
+	  url: window.location,
+	  data: {
+		"_agca_templates_session_remove_license" : "true",
+		"template":template		
+		},
+	  success: callback	  
+	});	
+}
+
+
+/*FAQ: Invalid template license key: reopen browser and add key again,
+Wrong or expired license key. You can still use your template, but updates are not available any more.(1): reopen broeser
+*/
+					
+/*countdown*/	
+function agcaCountDownTimer(now, expire, id)
+{
+var _second = 1;
+var _minute = _second * 60;
+var _hour = _minute * 60;
+var _day = _hour * 24;
+var _year = _day * 365;
+
+var nowParts = now.split('-');
+var expireParts = expire.split('-');
+var timer;
+var diff = expire - now;
+
+	function showRemaining(df) {	
+		diff = diff-1;
+		//console.log(diff);
+				
+		var days = Math.floor((diff % _year) / _day);
+		var hours = Math.floor((diff % _day) / _hour);
+		var minutes = Math.floor((diff % _hour) / _minute);
+		var seconds = Math.floor((diff % _minute) / _second);
+		var str = days +"d " + hours +"h "+ minutes +"min "+ seconds+"sec";
+		jQuery(id+" .countdown").html("Available only for:</br>" + str);
+		if (diff < 0) {
+			clearInterval(timer);
+			jQuery(id+" .countdown").html("</br>About to expire...");
+			return;
+		}
+	}
+	timer = setInterval(function(){
+		showRemaining(diff);
+	}, 1000);	
+}	
