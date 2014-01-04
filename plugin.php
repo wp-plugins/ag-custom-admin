@@ -29,13 +29,12 @@ class AGCA{
 	private $colorizer="";	
 	private $active_plugin;
 	private $agca_version;    
-	private $agca_debug = true;    
+	private $agca_debug = false;    
 	private $admin_capabilities;    	
     private $context = "";
     private $saveAfterImport = false;	
 	private $templateCustomizations = "";
-	private $templates_ep = "http://agca.argonius.com/configuration.php";
-	//private $templates_ep = "http://agca.argonius.com/debug.php";
+	private $templates_ep = "http://agca.argonius.com/configuration.php";	
 	public function __construct()
 	{   	        			
         $this->reloadScript();		
@@ -1317,6 +1316,12 @@ if(isset($_POST['_agca_import_settings']) && $_POST['_agca_import_settings']=='t
 }
 ?>    
 </script>
+<?php if(get_option('agca_admin_menu_arrow') == true){ ?>											
+	<style type="text/css">
+		.wp-has-current-submenu:after{border:none !important;}
+		#adminmenu li.wp-has-submenu.wp-not-current-submenu.opensub:hover:after{border:none !important;}
+	</style>										
+<?php } ?>
 <script type="text/javascript">
   /* <![CDATA[ */
 jQuery(document).ready(function() {
@@ -1394,7 +1399,8 @@ try
                                        
 					<?php if(get_option('agca_admin_menu_submenu_round')==true){ ?>
 							jQuery("#adminmenu .wp-submenu").css("border-radius","<?php echo get_option('agca_admin_menu_submenu_round_size'); ?>px");
-                                                   roundedSidberSize = <?php echo get_option('agca_admin_menu_submenu_round_size'); ?>;
+							<?php $roundedSidebarSize = get_option('agca_admin_menu_submenu_round_size'); ?>
+                                                   roundedSidberSize = <?php echo ($roundedSidebarSize == "")?"0":$roundedSidebarSize; ?>;
                                                         
                                                         
 					<?php } ?>
@@ -1542,7 +1548,7 @@ try
 										});
 							<?php } ?>
                                                         <?php if(get_option('agca_admin_menu_arrow') == true){ ?>											
-								jQuery("#adminmenu .wp-menu-arrow").css("visibility","hidden");
+								jQuery("#adminmenu .wp-menu-arrow").css("visibility","hidden");							
 										
 							<?php } ?>
 					<?php if(get_option('agca_admin_menu_turnonoff') == 'on'){ ?>

@@ -281,7 +281,7 @@ function agca_getTemplateSettingsCallback(data){
 					
 					//get previously saved value
 					for(var ind2 in currentSettings){
-						if(currentSettings[ind2].code == settings[ind].name){
+						if(currentSettings[ind2]!= null && currentSettings[ind2].code == settings[ind].name){
 							currentValue = currentSettings[ind2].value;
 						}
 					}
