@@ -301,9 +301,13 @@ class AGCA{
 	}
 	
 	function reloadScript(){
-            if(in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) || WP_ADMIN == 1){              			
-				add_action('init', array(&$this,'agca_enqueue_scripts'));				
-            }
+		$isAdmin = false;
+		if(defined('WP_ADMIN') && WP_ADMIN == 1){
+			$isAdmin = true;
+		}
+        if(in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) || $isAdmin){              			
+			add_action('init', array(&$this,'agca_enqueue_scripts'));				
+        }             
 	}
 	
 	function agca_register_settings() {	
@@ -698,14 +702,18 @@ class AGCA{
 			}
 		}else{
 			//$elements = json_decode($arr[$type],true);			
-			$elements = $this->agca_decode($arr[$type]);
+			if(isset($arr[$type])){
+				$elements = $this->agca_decode($arr[$type]);
+			}
 			if($elements !=""){
 				foreach($elements as $element){
 					if(!$first){
 						$array .=",";
 					}
 					$parts = explode(" : ",$element);
-					$array.="[".$parts[0].", ".$parts[1]."]";					
+					if(isset($parts[0]) && isset($parts[1])){
+						$array.="[".$parts[0].", ".$parts[1]."]";
+					}					
 					$first=false;
 				}	
 			}	
