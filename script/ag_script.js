@@ -305,7 +305,7 @@ function showHideSection(text) {
             jQuery('#section_ag_colorizer_settings').show();
             jQuery('#section_ag_colorizer_settings .section_title').trigger('focus');
             break;
-		case 'Templates':
+		case 'Admin Themes':
 			if(!jQuery('#section_templates').hasClass("loaded")){
 				jQuery('#section_templates').addClass('loaded');
 				agca_client_init();

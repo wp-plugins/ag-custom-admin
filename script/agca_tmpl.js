@@ -32,10 +32,10 @@ function agca_getTemplateByLicenseKeyCallback(data){
 		if(data.data.length < 100){
 			template_selected = data.data;
 			var key = agcaTemplatesSessionGetLicenseKey(template_selected);
-			agcaProgress('Loading template... Please wait...');			
+			agcaProgress('Loading theme... Please wait...');			
 			agca_getTemplate(template_selected,key);
 		}else{
-			agcaDebug("Uknown template name" + data.data);
+			agcaDebug("Uknown theme name" + data.data);
 		}
 		
 	}																			
@@ -60,7 +60,7 @@ function agca_client_init(){
 	agcaDebug('FN:agca_client_init()');
 	agca_getLocalTemplates();
 	checkIfTemplatesAreLoaded(1);
-	jQuery('#agca_templates').html('<p class="initialLoader" style="font-size:18px;color:gray;font-style:italic">Loading templates...</p>');										
+	jQuery('#agca_templates').html('<p class="initialLoader" style="font-size:18px;color:gray;font-style:italic">Loading themes...</p>');										
 }
 
 function agca_setupXHR(){			
@@ -93,7 +93,7 @@ function agca_setupXHR(){
 						}	
 					}
 				}else{
-					printInitialAGCAError("Please update your browser in order to view AG Custom Admin templates.");
+					printInitialAGCAError("Please update your browser in order to view AG Custom Admin themes.");
 				}
 			}					
 		}	
@@ -196,7 +196,7 @@ function agca_loadTemplateSettingsCore(template, isInitial){
 	var calbName = "agca_getTemplateSettingsCallback";
 	
 	if(isInitial){
-		agcaProgress("Loading template settings...");
+		agcaProgress("Loading theme settings...");
 		calb = agca_getTemplateSettingsInitialCallback;
 		calbName = "agca_getTemplateSettingsInitialCallback";
 	}
@@ -215,7 +215,7 @@ function agca_getTemplateSettingsInitialCallback(data){
 	if(data.success == 0){
 		agcaInfoMessage("Error",data.data);
 		//TODO - what if template is loaded, but settings are not?
-		console.log('ERR:template settings are not loaded');
+		console.log('ERR:theme settings are not loaded');
 	}else{		
 		var settings = "";
 		var filteredSettings = {};
@@ -234,7 +234,7 @@ function agca_getTemplateSettingsInitialCallback(data){
 					newItem.default_value = settings[ind].default_value;
 					filteredSettings[ind] = newItem;
 				}
-				agcaDebug("Selected template:" + template_selected);			
+				agcaDebug("Selected theme:" + template_selected);			
 				console.log(filteredSettings);		
 				
 			}
@@ -265,7 +265,7 @@ function agca_getTemplateSettingsCallback(data){
 			}
 			settings = JSON.parse(data.data);
 			if(settings.length == 0){
-				jQuery('#agca_template_settings .agca_loader').html("Additional settings are not available for this template");
+				jQuery('#agca_template_settings .agca_loader').html("Additional settings are not available for this theme");
 			}else{
 				jQuery('#agca_template_settings .agca_loader').hide();
 				jQuery('#agca_save_template_settings').show();
@@ -405,7 +405,7 @@ function agca_saveTemplateSettingsFromForm(template){
 		
 	});
 	
-	jQuery('#agca_template_settings').html("<p>Applying template settings...</p>");
+	jQuery('#agca_template_settings').html("<p>Applying theme settings...</p>");
 	agca_saveTemplateSettingsCore(template, settings, function(data){																				
 		window.location = 'tools.php?page=ag-custom-admin/plugin.php';		
 	});
@@ -444,9 +444,9 @@ function agca_activateTemplate(template){
 		return false;
 	};*/
 	if(template == ""){
-		agcaProgress('Deactivating template... Please wait...');
+		agcaProgress('Deactivating theme... Please wait...');
 	}else{
-		agcaProgress('Activating template... Please wait...');
+		agcaProgress('Activating theme... Please wait...');
 	}
 	
 	agcaDebug('FN:agca_activateTemplate('+template+')');
@@ -474,12 +474,12 @@ function agca_activateTemplate(template){
 
 function agca_removeAllTemplates(){
 	agcaDebug('FN:agca_removeAllTemplates()');
-	yesnoPopup("Confirm","Are you sure? All installed templates will be removed completely?",agca_removeAllTemplatesConfirmed);										
+	yesnoPopup("Confirm","Are you sure? All installed themes will be removed completely?",agca_removeAllTemplatesConfirmed);										
 }
 
 function agca_removeAllTemplatesConfirmed(){
 	agcaDebug('FN:agca_removeAllTemplatesConfirmed()');
-	agcaProgress('Removing all templates... Please wait...');	
+	agcaProgress('Removing all themes... Please wait...');	
 	window.setTimeout(function(){
 		window.location = 'tools.php?page=ag-custom-admin/plugin.php&agca_action=remove_templates';										
 	},2000);	
@@ -602,7 +602,7 @@ function agca_error(data){
 	agcaDebug("FN:agca_error()");
 	clearTimeout(agcaLoadingTimeOut);
 	if(jQuery('#agca_templates p:first').hasClass('initialLoader')){
-			jQuery('#agca_templates p:first').text('Unable to load templates. Please submit this error to AGCA support. Thank you!');										
+			jQuery('#agca_templates p:first').text('Unable to load themes. Please submit this error to AGCA support. Thank you!');										
 	}
 	alert('AG CUSTOM ADMIN TEMPLATE - ERROR\n\nError occured while loading configuration:\n'+data.url+'\n\n'+data.data);
 }
@@ -638,8 +638,8 @@ function checkIfTemplatesAreLoaded(pass){
 	else if(pass == 4){
 		agcaLoadingTimeOut = window.setTimeout(function(){
 		if(jQuery('#agca_templates p:first').hasClass('initialLoader')){
-			jQuery('#agca_templates p:first').html('Sorry, unable to load templates right now. Please try again later.</br>We recommend using only latest browsers for template management.');
-			agcaDebug('ERR:Unable to load templates');
+			jQuery('#agca_templates p:first').html('Sorry, unable to load themes right now. Please try again later.</br>We recommend using only latest browsers for theme management.');
+			agcaDebug('ERR:Unable to load themes');
 		}
 		},10000);
 	}										

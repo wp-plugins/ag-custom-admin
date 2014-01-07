@@ -34,7 +34,7 @@ class AGCA{
     private $context = "";
     private $saveAfterImport = false;	
 	private $templateCustomizations = "";
-	private $templates_ep = "http://agca.argonius.com/configuration.php";	
+	private $templates_ep = "http://wordpressadminpanel.com/debug.php";	
 	public function __construct()
 	{   	        			
         $this->reloadScript();		
@@ -301,13 +301,9 @@ class AGCA{
 	}
 	
 	function reloadScript(){
-		$isAdmin = false;
-		if(defined('WP_ADMIN') && WP_ADMIN == 1){
-			$isAdmin = true;
-		}
-        if(in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) || $isAdmin){              			
-			add_action('init', array(&$this,'agca_enqueue_scripts'));				
-        }             
+            if(in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php')) || WP_ADMIN == 1){              			
+				add_action('init', array(&$this,'agca_enqueue_scripts'));				
+            }
 	}
 	
 	function agca_register_settings() {	
@@ -702,18 +698,14 @@ class AGCA{
 			}
 		}else{
 			//$elements = json_decode($arr[$type],true);			
-			if(isset($arr[$type])){
-				$elements = $this->agca_decode($arr[$type]);
-			}
+			$elements = $this->agca_decode($arr[$type]);
 			if($elements !=""){
 				foreach($elements as $element){
 					if(!$first){
 						$array .=",";
 					}
 					$parts = explode(" : ",$element);
-					if(isset($parts[0]) && isset($parts[1])){
-						$array.="[".$parts[0].", ".$parts[1]."]";
-					}					
+					$array.="[".$parts[0].", ".$parts[1]."]";					
 					$first=false;
 				}	
 			}	
@@ -1924,7 +1916,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 				<li class="normal" ><a href="#admin-menu-settings" title="Settings for main admin menu">Admin Menu</a></li>
 				<li class="normal"><a href="#ag-colorizer-setttings" title="AG colorizer settings">Colorizer</a></li>				
                 <li class="normal"><a href="#ag-advanced" title="My custom scripts">Advanced</a></li>
-				<li class="normal" style=""><a style="color:#DB6014;font-weight:bolder;" href="#ag-templates" title="AG Custom Admin Templates">Templates</a></li>
+				<li class="normal" style=""><a style="color:#DB6014;font-weight:bolder;" href="#ag-templates" title="AG Custom Admin Themes">Admin Themes</a></li>
 								
 				<li style="background:none;border:none;padding:0;"><a id="agca_donate_button" target="_blank" style="margin-left:8px" title="Like this plugin? You can support its future development by giving a donation by your wish " href="http://agca.argonius.com/ag-custom-admin/support-for-future-development"><img alt="Donate" src="<?php echo trailingslashit(plugins_url(basename(dirname(__FILE__)))); ?>images/btn_donate_LG.gif" /></a>
 				</li>                                
@@ -2836,7 +2828,7 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 							 <div id="picker"></div>			
 						</div>
 						<div id="section_templates" style="display:none" class="ag_section">	
-							<h2 class="section_title" tabindex="-1"><span style="float:left">Templates</span><span style="width:100px;color:red;font-size:15px;float:left;margin-top:-8px;margin-left:6px;display:block">(beta)</span></h2>											
+							<h2 class="section_title" tabindex="-1"><span style="float:left">Admin Themes</span><span style="width:100px;color:red;font-size:15px;float:left;margin-top:-8px;margin-left:6px;display:block">(beta)</span></h2>											
 							<br /><br />						
 							<table class="form-table" width="500px">					
 							<tr valign="center">								
@@ -2849,10 +2841,10 @@ jQuery('#ag_add_adminmenu').append(buttonsJq);
 							<tr>							
 								<td>
 									<div id="advanced_template_options" style="display:none">
-										<h4>Advanced Template Actions</h4>
-										<p style="color:red;"><strong>WARNING:</strong> Use these template actions only if you are experiencing some problems with AGCA templates. With these options you can deactivate or remove all installed templates.</p>
-										<p><a href="javascript:agca_activateTemplate('');" title="When used, currently applied AGCA template will be disabled</br>and WordPress will use default admin UI.</br>Templates will not be removed, and you can use them again.">DEACTIVATE CURRENT TEMPLATE</a> - templates will be deactivated, but still installed.</p>
-										<p><a href="javascript:agca_removeAllTemplates();" title="All templates will be removed, including all template settings and customizations.</br>If you're using commercial template, you can install it again on the same site and activation will not be charged">REMOVE ALL TEMPLATES</a> - installed templates will be removed.</p>										
+										<h4>Advanced Theme Actions</h4>
+										<p style="color:red;"><strong>WARNING:</strong> Use these theme actions only if you are experiencing some problems with AGCA themes. With these options you can deactivate or remove all installed themes.</p>
+										<p><a href="javascript:agca_activateTemplate('');" title="When used, currently applied AGCA theme will be disabled</br>and WordPress will use default admin UI.</br>Themes will not be removed, and you can use them again.">DEACTIVATE CURRENT THEME</a> - themes will be deactivated, but still installed.</p>
+										<p><a href="javascript:agca_removeAllTemplates();" title="All themes will be removed, including all theme settings and customizations.</br>If you're using commercial theme, you can install it again on the same site and activation will not be charged">REMOVE ALL THEMES</a> - installed themes will be removed.</p>										
 									</div>
 								</td>
 							</tr>
