@@ -4,7 +4,7 @@ Donate link: http://agca.argonius.com/ag-custom-admin/support-for-future-develop
 Tags: admin, customize, hide, change admin
 Requires at least: 3.8
 Tested up to: 3.8
-Stable tag: 1.3
+Stable tag: 1.3.1
  
 Hide or change items in admin panel. Customize buttons from admin menu. Colorize admin and login page with custom colors.
 
@@ -71,8 +71,8 @@ Here is the list of options:
 	- Change admin menu colors
 	- Change widget colors
 	
-	AGCA Templates
-	- Introducing AG Custom Admin templates for admin panel
+	Admin Panel Themes
+	- Use predefined AG Custom Admin themes for WordPress Admin Panel
 	
 	Advanced
 	- Add custom CSS
@@ -116,8 +116,11 @@ Try clearing browser's cache. If that does not work, go to browser's console and
 
 == Changelog ==
 
+= 1.3.1 =
+* First production version with AGCA Themes
+
 = 1.3 =
-* Introducing AG Custom Admin Templates
+* Introducing AG Custom Admin Themes
 
 = 1.2.7.1 =
 * Removed AGCA script on site pages automaticaly, if user is not logged in
@@ -285,8 +288,11 @@ Try clearing browser's cache. If that does not work, go to browser's console and
 
 == Upgrade Notice ==
 
+= 1.3.1 =
+Introducing AG Custom Admin Themes
+
 = 1.3 =
-Introducing AG Custom Admin Templates
+Introducing AG Custom Admin Themes
 
 = 1.2.7.1 =
 Bug fixes. Removing admin bar site title. Custom page titles in WP admin.
