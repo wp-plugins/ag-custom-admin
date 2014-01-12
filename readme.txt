@@ -1,8 +1,8 @@
 === AG Custom Admin ===
 Contributors: argonius
 Donate link: http://agca.argonius.com/ag-custom-admin/support-for-future-development
-Tags: admin, customize, hide, change admin
-Requires at least: 3.8
+Tags: admin, customize, hide, change admin, themes, admin themes
+Requires at least: 3.0
 Tested up to: 3.8
 Stable tag: 1.3.1
  
