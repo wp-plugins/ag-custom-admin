@@ -96,15 +96,18 @@ With this plugin you can easily customize WordPress **admin panel**, **login pag
 * Export/import customization settings
 	
 = Admin Themes =
-AG Custom Admin plugin contains specialy created admin panel and login professional and responsive themes that can be applied easily within AG Custom Admin plugin with few clicks!
-We will add more different and much better themes and theme options in future. 
+AG Custom Admin plugin contains specialy created professional and responsive themes for admin panel and login page, that can be applied easily within AG Custom Admin plugin with only few clicks!
+We will add more themes with better styles and theme options in future. 
 
 For more info about AG Custom Admin themes, please go to [WordPress Admin Panel Themes](http://wordpressadminpanel.com/themes/home) site.
 
-= Contact/Support =
-**IMPORTANT**: AG Custom Admin should always be updated before updating WordPress. If you are unable to login or you have any other problems, please check our [FAQ](http://wordpress.org/extend/plugins/ag-custom-admin/faq/) and [SUPPORT](http://wordpress.org/support/plugin/ag-custom-admin) page.
+= Contact =
+If you are unable to login or you have any other problems, please check our [FAQ](http://wordpress.org/extend/plugins/ag-custom-admin/faq/) and [SUPPORT](http://wordpress.org/support/plugin/ag-custom-admin) page.
 
 For more information about the plugin please check [PLUGIN WEBSITE](http://agca.argonius.com/ag-custom-admin/)
+For more information about admin themes please check [THEMES WEBSITE](http://wordpressadminpanel.com/themes/home)
+
+**Important**: AG Custom Admin should always be updated before updating WordPress. 
 
 == Installation ==
 
