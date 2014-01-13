@@ -6,7 +6,7 @@ Requires at least: 3.0
 Tested up to: 3.8
 Stable tag: 1.3.2
  
-Hide or change items in admin panel. Customize buttons from admin menu. Colorize admin and login page with custom colors.
+All-in-one tool for admin panel customization. Apply admin panel themes. Change almost everything: admin menu, dashboard, login page, admin bar, colors etc.
 
 == Description ==
 With this plugin you can hide or change unwanted items in admin and login pages (like admin bar or footer text, remove Screen options, Help options or Favorites dropdown menu etc).
