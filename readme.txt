@@ -6,7 +6,7 @@ Requires at least: 3.0
 Tested up to: 3.8
 Stable tag: 1.3.2
  
-All-in-one tool for admin panel customization. Apply admin panel themes. Change almost everything: admin menu, dashboard, login page, admin bar, colors etc.
+All-in-one tool for admin panel customization. Change almost everything: admin menu, dashboard, login page, admin bar etc. Apply admin panel themes.
 
 == Description ==
 With this plugin you can hide or change unwanted items in admin and login pages (like admin bar or footer text, remove Screen options, Help options or Favorites dropdown menu etc).
