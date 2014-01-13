@@ -5,19 +5,24 @@ Tags: admin, customize, hide, change admin, themes, admin themes
 Requires at least: 3.0
 Tested up to: 3.8
 Stable tag: 1.3.2
+License: GPLv2 or later
  
 All-in-one tool for admin panel customization. Change almost everything: admin menu, dashboard, login page, admin bar etc. Apply admin panel themes.
 
 == Description ==
-With this plugin you can hide or change unwanted items in admin and login pages (like admin bar or footer text, remove Screen options, Help options or Favorites dropdown menu etc).
-You can also completely change or hide buttons from admin menu, or add new customized buttons. With Colorizer you can completely customize background and text colors in admin and login page.
+With this plugin you can customize WordPress **admin panel** and **login page** in tiny details.
+It's easy to change **admin menu** items, to edit/rename existing, add new, remove unwanted items or change colors.  
+With **AG Custom Admin Themes**, it's never been so easy to apply free and responsive admin panel themes.
+There are also dozens of **admin panel options** to hide or change existing WordPress admin panel and login page items like Dashboard widgets, Help and Screen options, WordPress logos, links, menus etc.
+With **Colorizer** tool integrated with AG Custom Admin panel, it's very easy to change default WordPress admin panel colors, backgrounds and fonts.
+This is excelent tool for **Branding** your admin panel pages with your custom content, colors and images.
 
 Here is the list of options:
 
 	Admin Bar Options
-	- Hide admin bar completely
-	- Hide admin bar on front end
-	- Change admin bar logo and link
+* Hide admin bar completely, 
+* Hide admin bar on front end, * Change admin bar logo and link
+
 	- Hide admin bar WordPress logo
 	- Add custom image in admin header
 	- Add custom admin bar logo
@@ -79,6 +84,12 @@ Here is the list of options:
 	- Add custom JavaScript
 	- Export/import customization settings
 
+	=== Admin Themes ===
+AG Custom Admin plugin contains specialy created admin panel and login professional and responsive themes that can be applied easily within AG Custom Admin plugin with few clicks!
+We will add more different and much better themes and theme options in future. 
+
+For more info about AG Custom Admin themes, please go to [WordPress Admin Panel Themes](http://wordpressadminpanel.com/themes/home) site.
+
 **IMPORTANT**: AG Custom Admin should always be updated before updating WordPress. If you are unable to login or you have any other problems, please check our [FAQ](http://wordpress.org/extend/plugins/ag-custom-admin/faq/) and [SUPPORT](http://wordpress.org/support/plugin/ag-custom-admin) page.
 
 For more information about the plugin please check [PLUGIN WEBSITE](http://agca.argonius.com/ag-custom-admin/)
@@ -88,12 +99,6 @@ For more information about the plugin please check [PLUGIN WEBSITE](http://agca.
 1. Upload `ag-custom-admin` directory to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Activated plugin should appear in 'Tools' menu
-
-== Admin Themes ==
-AG Custom Admin plugin contains specialy created admin panel and login professional and responsive themes that can be applied easily within AG Custom Admin plugin with few clicks!
-We will add more different and much better themes and theme options in future. 
-
-For more info about AG Custom Admin themes, please go to [WordPress Admin Panel Themes](http://wordpressadminpanel.com/themes/home) site.
 
 == Frequently Asked Questions ==
 
