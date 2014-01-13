@@ -118,13 +118,13 @@ For more information about the plugin please check [PLUGIN WEBSITE](http://agca.
 
 = I see only blank page. What can I do? =
 This is caused by JavaScript error thrown by this or some other plugin. Please open browser's console and try to find JavaScript errors. Try to find the source of the error, it is probably thrown by some plugin. If you can find the source, please try to disable that plugin or theme and post that error on their support page. You could try also disabling plugins one-by-one to see when this problem occures. If you can't access login page, please temporary disable JavaScript in your browser and refresh the page.
-If this does not work, try to find javaScript error in browser's console and post it to our support page.
+If this does not work, try to find JavaScript error in browser's console and post it to our support page.
 
 = I cannot log in to admin panel =
-If you see blank page or login form is disappeared, it's most likely that you have some errors thrown in your WordPress site. This is caused by JavaScript error thrown by this or some other plugin. If you want to deactivate plugin, but you can't access admin panel, turn off JavaScript in your browser and than log in back and deactivate plugin (This works only for administrator). Try also to clear browser's cache. If this does not work, try to find javaScript error in browser's console and post it to plugin's support page.
+If you see blank page or login form is disappeared, it's most likely that you have some errors thrown in your WordPress site. This is caused by JavaScript error thrown by this or some other plugin. If you want to deactivate plugin, but you can't access admin panel, turn off JavaScript in your browser and then log in back and deactivate plugin (This works only for administrator). Try also to clear browser's cache. If this does not work, try to find JavaScript error in browser's console and post it to plugin's support page.
 
 = Plugin does not work after upgrading to new version. What should I do? =
-Try to clear browser's cache, and reload page. You can try to download fresh copy of plugin and to re-install it again. If nothing of these solutions helps, please contact our support.
+Try to clear browser's cache, and reload page. You can try to download fresh copy of plugin and to re-install it again. Make sure to have latest plugin and WordPress versions installed. If nothing of these solutions helps, please contact our support.
 
 = Something is wrong with Admin Menu buttons =
 Please use 'Reset Settings' button on Admin Menu page to reset menu configuration to defaults. Remember that you should postpone admin menu configuration to the very end of admin page customization, because, any changes made from other plugins to admin menu (e.g adding new button of plugin that is activated, or removing that button when plugin is deactivated) could corrupt admin menu configuration.
