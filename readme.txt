@@ -19,11 +19,9 @@ With **Colorizer** tool integrated with AG Custom Admin panel, it's very easy to
 
 This is excelent tool for **Branding** your admin panel pages with your custom content, colors and images.
 
-Here is the list of options:
-
-	Admin Bar Options
-* Hide admin bar completely, 
-* Hide admin bar on front end, * Change admin bar logo and link
+= Admin Bar Options = 
+*Hide admin bar completely, 
+*Hide admin bar on front end, *Change admin bar logo and link
 
 	- Hide admin bar WordPress logo
 	- Add custom image in admin header
