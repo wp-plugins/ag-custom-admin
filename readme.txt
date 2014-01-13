@@ -11,35 +11,35 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 All-in-one tool for admin panel customization. Change almost everything: admin menu, dashboard, login page, admin bar etc. Apply admin panel themes.
 
 == Description ==
-With this plugin you can customize WordPress **admin panel** and **login page** in tiny details.
+With this plugin you can customize WordPress **admin panel**, **login page**, **admin menu**, **admin bar** etc.. in tiny details.
 
-It's easy to change **admin menu** items, to edit/rename existing, add new, remove unwanted items or change colors.  
-With **AG Custom Admin Themes**, it's never been so easy to apply free and responsive admin panel themes.
-There are also dozens of **admin panel options** to hide or change existing WordPress admin panel and login page items like Dashboard widgets, Help and Screen options, WordPress logos, links, menus etc.
-With **Colorizer** tool integrated with AG Custom Admin panel, it's very easy to change default WordPress admin panel colors, backgrounds and fonts.
-
-This is excelent tool for **Branding** your admin panel pages with your custom content, colors and images.
+* **ADMIN MENU**: It's easy to change admin menu items, to edit/rename existing, add new, remove unwanted items or change colors.  
+* **AG CUSTOM ADMIN THEMES**: it was never been so easy to apply free and responsive admin panel themes with just few clicks.
+* **ADMIN PANEL OPTIONS**: There are also dozens of many admin panel iptions used to hide or change existing WordPress admin panel and login page items like Dashboard widgets, Help and Screen options, WordPress logos, links, menus etc.
+* **ADMIN MENU**: Change and remove existing and add custom admin menu items. Brand it with custom colors.
+* **COLORIZER**: This tool is integrated with AG Custom Admin panel and can be used to change default WordPress admin panel colors, backgrounds and fonts.
+* **BRANDING**: Brand your admin panel pages with custom content, colors and images and text.
 
 = Admin Bar Options =
 * Hide admin bar completely 
-* Hide admin bar on front end, *Change admin bar logo and link
-
-	- Hide admin bar WordPress logo
-	- Add custom image in admin header
-	- Add custom admin bar logo
-	- Hide admin bar dropdown menus
-	- Hide "New" dropdown items
-	- Hide comments from admin bar
-	- Hide updates from admin bar
-	- Hide WordPress update notification bar
-	- Hide default blog heading in admin bar
-	- Change admin bar heading text
-	- Hide Screen Options menu
-	- Hide Help menu
-	- Hide Favorite Actions
-	- Change/remove Howdy text
-	- Change Log out text
-	- Log out button only
+* Hide admin bar on front end
+* Change admin bar logo and link
+* Hide admin bar WordPress logo
+* Add custom image in admin header
+* Add custom admin bar logo
+* Hide admin bar dropdown menus
+* Hide "New" dropdown items
+* Hide comments from admin bar
+* Hide updates from admin bar
+* Hide WordPress update notification bar
+* Hide default blog heading in admin bar
+* Change admin bar heading text
+* Hide Screen Options menu
+* Hide Help menu
+* Hide Favorite Actions
+* Change/remove Howdy text
+* Change Log out text
+* Log out button only
 
 	Admin Footer Options
 	- Hide footer completely
