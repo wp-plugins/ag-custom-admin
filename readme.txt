@@ -104,8 +104,7 @@ For more info about AG Custom Admin themes, please go to [WordPress Admin Panel 
 = Contact =
 If you are unable to login or you have any other problems, please check our [FAQ](http://wordpress.org/extend/plugins/ag-custom-admin/faq/) and [SUPPORT](http://wordpress.org/support/plugin/ag-custom-admin) page.
 
-For more information about the plugin please check [PLUGIN WEBSITE](http://agca.argonius.com/ag-custom-admin/)
-For more information about admin themes please check [THEMES WEBSITE](http://wordpressadminpanel.com/themes/home)
+For more information about the plugin please check [PLUGIN WEBSITE](http://agca.argonius.com/ag-custom-admin/) and for more information about admin themes please check [THEMES WEBSITE](http://wordpressadminpanel.com/themes/home)
 
 **Important**: AG Custom Admin should always be updated before updating WordPress. 
 
@@ -117,20 +116,24 @@ For more information about admin themes please check [THEMES WEBSITE](http://wor
 
 == Frequently Asked Questions ==
 
-= Plugin does not work after upgrading to new version. What should I do? =
-Try to clear browser's cache, and reload page. In extreme situations, you would need to remove plugin and to download and install fresh installation from WordPress repository.
+= I see only blank page. What can I do? =
+This is caused by JavaScript error thrown by this or some other plugin. Please open browser's console and try to find JavaScript errors. Try to find the source of the error, it is probably thrown by some plugin. If you can find the source, please try to disable that plugin or theme and post that error on their support page. You could try also disabling plugins one-by-one to see when this problem occures. If you can't access login page, please temporary disable JavaScript in your browser and refresh the page.
+If this does not work, try to find javaScript error in browser's console and post it to our support page.
 
-= I see only blank page. What to do? =
-This is caused by JavaScript error thrown by AGCA or some other plugin. If you want to deactivate plugin, but you can't access admin panel, turn off JavaScript in your browser and than log in back and deactivate plugin (This works only for administrator). Try also to clear browser's cache. If this does not work, try to find javaScript error in browser's console and post it to plugin's support page.
+= I cannot log in to admin panel =
+If you see blank page or login form is disappeared, it's most likely that you have some errors thrown in your WordPress site. This is caused by JavaScript error thrown by this or some other plugin. If you want to deactivate plugin, but you can't access admin panel, turn off JavaScript in your browser and than log in back and deactivate plugin (This works only for administrator). Try also to clear browser's cache. If this does not work, try to find javaScript error in browser's console and post it to plugin's support page.
+
+= Plugin does not work after upgrading to new version. What should I do? =
+Try to clear browser's cache, and reload page. You can try to download fresh copy of plugin and to re-install it again. If nothing of these solutions helps, please contact our support.
 
 = Something is wrong with Admin Menu buttons =
 Please use 'Reset Settings' button on Admin Menu page to reset menu configuration to defaults. Remember that you should postpone admin menu configuration to the very end of admin page customization, because, any changes made from other plugins to admin menu (e.g adding new button of plugin that is activated, or removing that button when plugin is deactivated) could corrupt admin menu configuration.
 
-= Some errors appear on my page =
+= Errors appear on admin/login pages =
 Go to browser's console and see if there are any errors. Try to locate them. If you can't fix error by yourself, post it back to plugin's support page.
 
-= Plugin does not work =
-Try clearing browser's cache. If that does not work, go to browser's console and see if there are any errors. Try to locate them. If you can't fix error by yourself, post it back to plugin's support page. When trying to locate the problem, the best way is to disable other plugins, because there could be a conflict with them. If there is a conflict with other plugin, it can be found by disabling one by one plugin, until the problem is solved.
+= Some options are not working =
+Plugin should be always up-to-date with latest WordPress release. If you have found out that something is not working in the latest WordPress, please contact us and let us know. If you're using older WordPress version, some options could be deprecated. In that case, please check our [COMPATIBILITY](http://agca.argonius.com/ag-custom-admin/ag_custom_admin/recommended-ag-custom-admin-version-for-your-wordpress-version) page to find the best AG Custom Admin version for your WordPress.
  
 
 == Screenshots ==
