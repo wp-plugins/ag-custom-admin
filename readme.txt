@@ -1,7 +1,7 @@
 === AG Custom Admin ===
 Contributors: argonius
 Donate link: http://agca.argonius.com/ag-custom-admin/support-for-future-development
-Tags: admin, customize, hide, change admin, themes, admin themes
+Tags: admin, customize, hide, change admin, themes, admin themes, admin bar, login page
 Requires at least: 3.0
 Tested up to: 3.8
 Stable tag: 1.3.2
@@ -11,14 +11,14 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 All-in-one tool for admin panel customization. Change almost everything: admin menu, dashboard, login page, admin bar etc. Apply admin panel themes.
 
 == Description ==
-With this plugin you can customize WordPress **admin panel**, **login page**, **admin menu**, **admin bar** etc.. in tiny details.
+With this plugin you can easily customize WordPress **admin panel**, **login page**, **admin menu**, **admin bar** etc.. in tiny details and apply free responsive admin themes.
 
-* **ADMIN MENU**: It's easy to change admin menu items, to edit/rename existing, add new, remove unwanted items or change colors.  
-* **AG CUSTOM ADMIN THEMES**: it was never been so easy to apply free and responsive admin panel themes with just few clicks.
-* **ADMIN PANEL OPTIONS**: There are also dozens of many admin panel iptions used to hide or change existing WordPress admin panel and login page items like Dashboard widgets, Help and Screen options, WordPress logos, links, menus etc.
-* **ADMIN MENU**: Change and remove existing and add custom admin menu items. Brand it with custom colors.
-* **COLORIZER**: This tool is integrated with AG Custom Admin panel and can be used to change default WordPress admin panel colors, backgrounds and fonts.
+* **ADMIN BAR**: Hide or change admin bar items. Remove WordPress traces from admin bar. Brand it with custom colors.
+* **ADMIN MENU**: Change and remove existing and add custom admin menu items. Brand it with custom colors. 
+* **ADMIN PANEL THEMES**: it was never been so easy to apply free and responsive admin panel themes with just few clicks.
+* **COLORIZER**: This tool is integrated with AG Custom Admin panel and can be used to change default WordPress admin panel colors, admin bar, admin menu, login page, backgrounds and fonts.
 * **BRANDING**: Brand your admin panel pages with custom content, colors and images and text.
+* **ADMIN PANEL OPTIONS**: There are also dozens of many other admin panel options used to hide or change existing WordPress admin panel and login page items like Dashboard widgets, Help and Screen options, WordPress logos, links, menus etc. See the full list down below.
 
 = Admin Bar Options =
 * Hide admin bar completely 
