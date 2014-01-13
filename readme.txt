@@ -11,80 +11,90 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 All-in-one tool for admin panel customization. Change almost everything: admin menu, dashboard, login page, admin bar etc. Apply admin panel themes.
 
 == Description ==
-With this plugin you can easily customize WordPress **admin panel**, **login page**, **admin menu**, **admin bar** etc.. in tiny details and apply free responsive admin themes.
+With this plugin you can easily customize WordPress **admin panel**, **login page**, **admin menu**, **admin bar** etc. in tiny details and apply free responsive **admin themes**.
 
 * **ADMIN BAR**: Hide or change admin bar items. Remove WordPress traces from admin bar. Brand it with custom colors.
 * **ADMIN MENU**: Change and remove existing and add custom admin menu items. Brand it with custom colors. 
-* **ADMIN PANEL THEMES**: it was never been so easy to apply free and responsive admin panel themes with just few clicks.
+* **ADMIN THEMES**: it was never been so easy to apply free and responsive admin panel themes with just few clicks.
 * **COLORIZER**: This tool is integrated with AG Custom Admin panel and can be used to change default WordPress admin panel colors, admin bar, admin menu, login page, backgrounds and fonts.
-* **BRANDING**: Brand your admin panel pages with custom content, colors and images and text.
+* **BRANDING**: Brand your admin panel pages with custom content, colors, images and text.
 * **ADMIN PANEL OPTIONS**: There are also dozens of many other admin panel options used to hide or change existing WordPress admin panel and login page items like Dashboard widgets, Help and Screen options, WordPress logos, links, menus etc. See the full list down below.
+
+
 
 = Admin Bar Options =
 * Hide admin bar completely 
-* Hide admin bar on front end
-* Change admin bar logo and link
-* Hide admin bar WordPress logo
-* Add custom image in admin header
-* Add custom admin bar logo
-* Hide admin bar dropdown menus
-* Hide "New" dropdown items
-* Hide comments from admin bar
-* Hide updates from admin bar
-* Hide WordPress update notification bar
-* Hide default blog heading in admin bar
-* Change admin bar heading text
-* Hide Screen Options menu
+* Hide admin bar completely, but show only Log Out button
+* Remove admin bar on site pages
+* Replace WordPress logo with custom image
+* Change link on admin bar logo
+* Change page title (html title tag) of all admin pages
+* Add custom branding image between admin bar and content on all pages
+* Hide WordPress in from admin bar
+* Hide site name in admin bar
+* Hide admin bar context menus
+* Hide "Comments" menu
+* Hide "New" menu
+* Hide "New" -> "Post"
+* Hide "New" -> "Link"
+* Hide "New" -> "Page"
+* Hide "New" -> "User"
+* Hide "New" -> "Media"
+* Hide update notifications
+* Add custom heading to admin bar
+* Hide yellow WordPress update notification
+* Hide Screen options menu
 * Hide Help menu
-* Hide Favorite Actions
-* Change/remove Howdy text
-* Change Log out text
-* Log out button only
+* Hide Favorite Actions menu
+* Change Howdy text
+* Change Log Out text
+* Remove "Edit My Profile" option from context menu
+* Show "Log Out" button only
 
-	Admin Footer Options
-	- Hide footer completely
-	- Change/remove footer text
-	- Change/remove footer version text
 
-	Dashboard Page Options
-	- Hide Dashboard heading icon
-	- Change Dashboard heading text
-	- Add custom Dashboard content
-	- Hide dashboard widgets
+= Admin Footer Options =
+* Hide footer completely
+* Change/remove footer text
+* Change/remove footer version text
 
-	Login Page Options
-	- Hide back to blog completely
-	- Change login image	
-	- Change hyperlink on login image
-	- Hide login image
-	- Round corners on login boxes
-	- Hide register and lost password links
-	- Change hyperlink on register button
-	
-	Admin Menu Options
-	- Rename menu and submenu items
-	- Remove menu and submenu items
-	- Add new buttons with custom links
-	- Remove icons from admin menu buttons
-	- Remove spaces between admin menu buttons
-	- Remove admin menu arrow on rollower
-	- Round admin submenu popups	
-	- Add custom branding image above the admin menu
-	- Add custom link to branding image
-	
-	Colorizer
-	- Change background and text colors on admin and login page	
-	- Change admin menu colors
-	- Change widget colors
-	
-	Admin Panel Themes
-	- Use predefined AG Custom Admin themes for WordPress Admin Panel
-	
-	Advanced
-	- Add custom CSS
-	- Add custom JavaScript
-	- Export/import customization settings
+= Dashboard Page Options =
+* Change Dashboard heading text
+* Add custom Dashboard HTML content
+* Hide dashboard widgets
 
+= Login Page Options =
+* Hide back to blog text
+* Change back to blog text
+* Change login image
+* Change hyperlink on login image
+* Hide login image
+* Round corners on login boxes
+* Hide register and lost password links
+* Change hyperlink on register button
+	
+= Admin Menu Options =
+* Rename menu and submenu items
+* Remove menu and submenu items
+* Add new buttons with custom links
+* Remove icons from admin menu buttons
+* Remove spaces between admin menu buttons
+* Remove admin menu arrow on mouseover
+* Round admin submenu popups	
+* Remove "Collapse" button	
+* Add custom branding image above the admin menu
+* Add custom link to branding image
+* Change admin menu auto-folding settings
+	
+= Colorizer =
+* Change background and text colors on admin and login page	
+* Change admin menu colors
+* Change widget colors
+
+= Advanced =
+* Add custom CSS
+* Add custom JavaScript
+* Export/import customization settings
+	
 = Admin Themes =
 AG Custom Admin plugin contains specialy created admin panel and login professional and responsive themes that can be applied easily within AG Custom Admin plugin with few clicks!
 We will add more different and much better themes and theme options in future. 
@@ -100,7 +110,7 @@ For more information about the plugin please check [PLUGIN WEBSITE](http://agca.
 
 1. Upload `ag-custom-admin` directory to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Activated plugin should appear in 'Tools' menu
+3. Activated plugin appears in 'Tools' menu
 
 == Frequently Asked Questions ==
 
