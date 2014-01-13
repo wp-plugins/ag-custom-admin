@@ -89,6 +89,12 @@ For more information about the plugin please check [PLUGIN WEBSITE](http://agca.
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Activated plugin should appear in 'Tools' menu
 
+== Admin Themes ==
+AG Custom Admin plugin contains specialy created admin panel and login professional and responsive themes that can be applied easily within AG Custom Admin plugin with few clicks!
+We will add more different and much better themes and theme options in future. 
+
+For more info about AG Custom Admin themes, please go to [WordPress Admin Panel Themes](http://wordpressadminpanel.com/themes/home) site.
+
 == Frequently Asked Questions ==
 
 = Plugin does not work after upgrading to new version. What should I do? =
