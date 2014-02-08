@@ -2,7 +2,6 @@
     // die if not uninstalling
     if( !defined( 'WP_UNINSTALL_PLUGIN' ) )
         exit ();
-
         delete_option( 'agca_role_allbutadmin' );
 		delete_option( 'agca_screen_options_menu' );
 		delete_option(  'agca_help_menu' );
