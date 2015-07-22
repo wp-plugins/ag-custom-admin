@@ -158,6 +158,7 @@ Plugin should be always up-to-date with latest WordPress release. If you have fo
 * Added check for non existing 'pagenow' GLOBAL variable
 * Using default WordPress theme when AGCA theme is activated
 * Fixed unknown font theme issue
+* Option to remove AGCA themes from admin bar
 
 = 1.4.8.1 =
 * Small bug fix
@@ -443,6 +444,7 @@ Plugin should be always up-to-date with latest WordPress release. If you have fo
 * Added check for non existing 'pagenow' GLOBAL variable
 * Using default WordPress theme when AGCA theme is activated
 * Fixed unknown font theme issue
+* Option to remove AGCA themes from admin bar
 
 = 1.4.8.1 =
 * Small bug fix
